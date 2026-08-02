@@ -1,0 +1,3812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0a0a1a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>HabitForge — Daily Tracker</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkhhYml0Rm9yZ2UiLAogICJzaG9ydF9uYW1lIjogIkhhYml0Rm9yZ2UiLAogICJkZXNjcmlwdGlvbiI6ICJUcmFjayB5b3VyIGRhaWx5IGhhYml0cyB3aXRoIHN0eWxlIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwYTBhMWEiLAogICJ0aGVtZV9jb2xvciI6ICIjMGEwYTFhIiwKICAiaWNvbnMiOiBbCiAgICB7ICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgNTEyIDUxMic+PHJlY3Qgd2lkdGg9JzUxMicgaGVpZ2h0PSc1MTInIHJ4PSc2MCcgZmlsbD0nJTIzMGEwYTFhJy8+PHRleHQgeD0nMjU2JyB5PSczMjAnIGZvbnQtc2l6ZT0nMjUwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPSd3aGl0ZScgZm9udC1mYW1pbHk9J3NhbnMtc2VyaWYnPvCfjI08L3RleHQ+PC9zdmc+IiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIiwgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIiB9CiAgXQp9" />
+
+    <style>
+        /* ============================================================
+                   RESET & BASE — THEME VARIABLES
+                   ============================================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            /* Dark theme (default) */
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --bg-card: rgba(255, 255, 255, 0.06);
+            --bg-card-hover: rgba(255, 255, 255, 0.10);
+            --glass-border: rgba(255, 255, 255, 0.10);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --text-primary: #f0f0ff;
+            --text-secondary: #a0a0c0;
+            --text-muted: #606080;
+            --accent: #7c5cfc;
+            --accent-dim: rgba(124, 92, 252, 0.25);
+            --accent-glow: #7c5cfc;
+            --gold: #fbbf24;
+            --gold-dim: rgba(251, 191, 36, 0.20);
+            --green: #34d399;
+            --green-dim: rgba(52, 211, 153, 0.20);
+            --red: #f87171;
+            --red-dim: rgba(248, 113, 113, 0.20);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --shadow-soft: 0 12px 48px rgba(0, 0, 0, 0.5);
+            --nav-bg: rgba(10, 10, 26, 0.85);
+            --particle-opacity: 0.5;
+        }
+
+        /* Light theme */
+        [data-theme="light"] {
+            --bg-primary: #f5f3ff;
+            --bg-secondary: #ede9fe;
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --bg-card-hover: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(124, 92, 252, 0.15);
+            --glass-shadow: 0 8px 32px rgba(124, 92, 252, 0.12);
+            --text-primary: #1e1b2e;
+            --text-secondary: #4b456a;
+            --text-muted: #8b86a8;
+            --accent: #6d4cdf;
+            --accent-dim: rgba(109, 76, 223, 0.18);
+            --accent-glow: #6d4cdf;
+            --gold: #b8860b;
+            --gold-dim: rgba(184, 134, 11, 0.15);
+            --green: #0e8b5e;
+            --green-dim: rgba(14, 139, 94, 0.12);
+            --red: #c62828;
+            --red-dim: rgba(198, 40, 40, 0.12);
+            --shadow-soft: 0 12px 48px rgba(109, 76, 223, 0.12);
+            --nav-bg: rgba(245, 243, 255, 0.88);
+            --particle-opacity: 0.2;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        /* ============================================================
+                   APP SHELL
+                   ============================================================ */
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 80px rgba(124, 92, 252, 0.06);
+            transition: background 0.4s ease;
+        }
+
+        /* ============================================================
+                   PARTICLE BACKGROUND
+                   ============================================================ */
+        #particles-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: var(--particle-opacity);
+            transition: opacity 0.6s ease;
+        }
+
+        /* ============================================================
+                   SCREENS
+                   ============================================================ */
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 16px 80px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            transform: translateY(12px);
+            z-index: 1;
+            background: var(--bg-primary);
+            scroll-behavior: smooth;
+        }
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            z-index: 2;
+        }
+        .screen-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .screen-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+            -webkit-text-fill-color: var(--text-secondary);
+        }
+
+        /* ============================================================
+                   BOTTOM NAV
+                   ============================================================ */
+        #bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
+            height: 68px;
+            align-items: center;
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 4px 12px;
+            border-radius: var(--radius-xs);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            font-family: var(--font);
+            min-width: 56px;
+        }
+        .nav-btn .nav-icon {
+            font-size: 22px;
+            line-height: 1;
+            transition: var(--transition);
+        }
+        .nav-btn .nav-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            opacity: 0.7;
+            transition: var(--transition);
+            color: var(--text-muted);
+        }
+        .nav-btn.active {
+            color: var(--text-primary);
+        }
+        .nav-btn.active .nav-label {
+            opacity: 1;
+            color: var(--accent);
+        }
+        .nav-btn.active .nav-icon {
+            transform: scale(1.1);
+        }
+        .nav-btn::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 32px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+        .nav-btn.active::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+        .nav-btn .badge-dot {
+            position: absolute;
+            top: 2px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 12px var(--gold);
+            animation: pulse-dot 1.8s infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(0.7);
+            }
+        }
+
+        /* ============================================================
+                   ONBOARDING
+                   ============================================================ */
+        #onboarding {
+            z-index: 20;
+            padding: 40px 24px 80px;
+            background: var(--bg-primary);
+            justify-content: center;
+            transition: background 0.4s ease;
+        }
+        #onboarding .onboard-step {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeSlide 0.5s ease;
+        }
+        #onboarding .onboard-step.active {
+            display: flex;
+        }
+        @keyframes fadeSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .onboard-logo {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .onboard-title {
+            font-size: 26px;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .onboard-desc {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.6;
+            -webkit-text-fill-color: var(--text-secondary);
+        }
+        .onboard-input {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            font-size: 16px;
+            color: var(--text-primary);
+            outline: none;
+            transition: var(--transition);
+            font-family: var(--font);
+            width: 100%;
+        }
+        .onboard-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-dim);
+        }
+        .onboard-input::placeholder {
+            color: var(--text-muted);
+        }
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 8px 0;
+        }
+        .avatar-option {
+            aspect-ratio: 1;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            font-size: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .avatar-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+        }
+        .avatar-option:hover {
+            background: var(--bg-card-hover);
+        }
+        .avatar-option.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+            box-shadow: 0 0 24px var(--accent-dim);
+        }
+        .avatar-upload-btn {
+            background: var(--bg-card);
+            border: 2px dashed var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .avatar-upload-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-card-hover);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #5b3fd4);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+            width: 100%;
+            box-shadow: 0 4px 24px var(--accent-dim);
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            transform: none;
+        }
+        .btn-secondary {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+            width: 100%;
+        }
+        .btn-secondary:active {
+            transform: scale(0.97);
+        }
+        .onboard-tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 8px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .task-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .task-input-row input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            padding: 10px 14px;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            font-family: var(--font);
+            transition: var(--transition);
+        }
+        .task-input-row input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+        .task-input-row .task-remove {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            transition: var(--transition);
+        }
+        .task-input-row .task-remove:hover {
+            color: var(--red);
+        }
+        .btn-add-task {
+            background: var(--bg-card);
+            border: 1px dashed var(--glass-border);
+            border-radius: var(--radius-xs);
+            padding: 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+            width: 100%;
+        }
+        .btn-add-task:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+        }
+        .golden-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 4px 0 8px;
+        }
+        .golden-select .day-chip {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .golden-select .day-chip.selected {
+            background: var(--gold-dim);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .golden-select .day-chip:active {
+            transform: scale(0.95);
+        }
+
+        .golden-task-item {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+        .golden-task-item .gt-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .golden-task-item .gt-row input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            padding: 8px 12px;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            font-family: var(--font);
+        }
+        .golden-task-item .gt-row input:focus {
+            border-color: var(--accent);
+        }
+        .golden-task-item .gt-remove {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .golden-task-item .gt-remove:hover {
+            color: var(--red);
+        }
+        .golden-task-item .gt-days {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .golden-task-item .gt-days .day-chip {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .golden-task-item .gt-days .day-chip.selected {
+            background: var(--gold-dim);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* ============================================================
+                   DASHBOARD
+                   ============================================================ */
+        #dashboard .greeting {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: var(--text-primary);
+        }
+        #dashboard .greeting span {
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin: 12px 0 16px;
+            flex-wrap: wrap;
+        }
+        .stat-pill {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 80px;
+            transition: var(--transition);
+        }
+        .stat-pill .stat-icon {
+            font-size: 20px;
+        }
+        .stat-pill .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .stat-pill .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+        .stat-pill .stat-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+        .stat-pill.gold .stat-value {
+            color: var(--gold);
+        }
+        .stat-pill.green .stat-value {
+            color: var(--green);
+        }
+        .stat-pill.purple .stat-value {
+            color: var(--accent);
+        }
+        .stat-pill.fire .stat-value {
+            color: #f97316;
+        }
+
+        .quote-box {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-style: italic;
+            color: var(--text-secondary);
+            text-align: center;
+            backdrop-filter: blur(8px);
+            position: relative;
+            -webkit-text-fill-color: var(--text-secondary);
+        }
+        .quote-box .quote-author {
+            display: block;
+            font-style: normal;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-size: 12px;
+            -webkit-text-fill-color: var(--text-muted);
+        }
+
+        .progress-ring-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 8px 0 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            backdrop-filter: blur(8px);
+        }
+        .progress-ring-wrap canvas {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+        }
+        .progress-ring-wrap .ring-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            -webkit-text-fill-color: var(--text-secondary);
+        }
+        .progress-ring-wrap .ring-value {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Task Cards */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 4px;
+            padding-bottom: 8px;
+        }
+        .task-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .task-card:active {
+            transform: scale(0.98);
+        }
+        .task-card .task-check {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+            font-size: 14px;
+            color: transparent;
+        }
+        .task-card.done .task-check {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+        .task-card .task-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .task-card .task-name {
+            font-size: 15px;
+            font-weight: 600;
+            transition: var(--transition);
+            color: var(--text-primary);
+        }
+        .task-card.done .task-name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+        .task-card .task-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 2px;
+        }
+        .task-card .task-meta .gold-badge {
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .task-card .task-xp {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+        .task-card .task-streak-fire {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .task-card .task-glow {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: var(--transition);
+            background: radial-gradient(circle at 30% 50%, var(--accent-dim), transparent 70%);
+        }
+        .task-card.done .task-glow {
+            opacity: 1;
+        }
+
+        /* ---- Elegant Golden Task Styling ---- */
+        .task-card.golden {
+            border-color: var(--gold-dim);
+            background: var(--gold-dim);
+        }
+        .task-card.golden .task-check {
+            border-color: var(--gold);
+        }
+        .task-card.golden.done .task-check {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: #1e1b2e;
+        }
+        .task-card.golden .task-name {
+            color: var(--gold);
+        }
+        .task-card.golden.done .task-name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+        .task-card.golden .task-glow {
+            background: radial-gradient(circle at 30% 50%, var(--gold-dim), transparent 70%);
+        }
+        .task-card.golden .task-xp {
+            color: var(--gold);
+        }
+
+        /* ============================================================
+                   CALENDAR — SIMPLE & CLEAN
+                   ============================================================ */
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .calendar-header .month-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+        }
+        .calendar-header .cal-nav {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            padding: 6px 14px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+            background: var(--bg-card);
+        }
+        .calendar-header .cal-nav:hover {
+            background: var(--bg-card-hover);
+        }
+        .calendar-header .cal-nav:active {
+            transform: scale(0.95);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+            margin-bottom: 16px;
+        }
+        .calendar-grid .cal-day-name {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 6px 0;
+            opacity: 0.7;
+        }
+        .calendar-grid .cal-day {
+            aspect-ratio: 1;
+            border-radius: var(--radius-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid transparent;
+            transition: var(--transition);
+            cursor: default;
+            position: relative;
+        }
+        .calendar-grid .cal-day.today {
+            border-color: var(--accent);
+            color: var(--text-primary);
+            font-weight: 600;
+            background: var(--accent-dim);
+        }
+        /* Clean indicator for golden days */
+        .calendar-grid .cal-day.has-golden {
+            background: var(--gold-dim);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        /* Clean indicator for completed days */
+        .calendar-grid .cal-day.completed {
+            background: var(--green-dim);
+            border-color: var(--green);
+            color: var(--green);
+        }
+        /* Override for today if it also has golden/completed status */
+        .calendar-grid .cal-day.today.has-golden,
+        .calendar-grid .cal-day.today.completed {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+            color: var(--text-primary);
+        }
+        .calendar-grid .cal-day.other-month {
+            opacity: 0.25;
+            color: var(--text-muted);
+        }
+        .calendar-grid .cal-day.other-month.has-golden {
+            opacity: 0.35;
+        }
+        .calendar-grid .cal-day.other-month.completed {
+            opacity: 0.35;
+        }
+
+        /* Golden reminders - refined */
+        .golden-reminders {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-top: 8px;
+        }
+        .golden-reminders .gr-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        .golden-reminders .gr-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+        }
+        .golden-reminders .gr-item:last-child {
+            border-bottom: none;
+        }
+        .golden-reminders .gr-item .gr-day {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        /* ============================================================
+                   ANALYTICS
+                   ============================================================ */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 14px 12px;
+            margin-bottom: 14px;
+            backdrop-filter: blur(8px);
+        }
+        .chart-container .chart-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 140px !important;
+            border-radius: var(--radius-xs);
+        }
+
+        /* ============================================================
+                   HEATMAP — Refined, smaller, professional
+                   ============================================================ */
+        .heatmap-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 14px 12px;
+            margin-top: 8px;
+            backdrop-filter: blur(8px);
+        }
+        .heatmap-wrapper .heatmap-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            gap: 3px;
+            margin-bottom: 6px;
+        }
+        .heatmap-grid .heat-cell {
+            aspect-ratio: 1;
+            border-radius: 3px;
+            background: var(--bg-card);
+            border: 1px solid transparent;
+            transition: var(--transition);
+            cursor: default;
+            min-width: 14px;
+            min-height: 14px;
+        }
+        .heatmap-grid .heat-cell.level-0 {
+            background: var(--bg-card);
+            border-color: var(--glass-border);
+        }
+        .heatmap-grid .heat-cell.level-1 {
+            background: rgba(124, 92, 252, 0.15);
+            border-color: rgba(124, 92, 252, 0.10);
+        }
+        .heatmap-grid .heat-cell.level-2 {
+            background: rgba(124, 92, 252, 0.35);
+            border-color: rgba(124, 92, 252, 0.20);
+        }
+        .heatmap-grid .heat-cell.level-3 {
+            background: rgba(124, 92, 252, 0.55);
+            border-color: rgba(124, 92, 252, 0.30);
+        }
+        .heatmap-grid .heat-cell.level-4 {
+            background: rgba(124, 92, 252, 0.80);
+            border-color: var(--accent);
+        }
+        .heatmap-grid .heat-cell.today-heat {
+            border-color: var(--gold);
+            box-shadow: 0 0 6px var(--gold-dim);
+        }
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .heatmap-legend .legend-label {
+            margin-right: 4px;
+        }
+        .heatmap-legend .legend-swatch {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            border: 1px solid var(--glass-border);
+        }
+        .heatmap-legend .legend-swatch.l0 {
+            background: var(--bg-card);
+        }
+        .heatmap-legend .legend-swatch.l1 {
+            background: rgba(124, 92, 252, 0.15);
+        }
+        .heatmap-legend .legend-swatch.l2 {
+            background: rgba(124, 92, 252, 0.35);
+        }
+        .heatmap-legend .legend-swatch.l3 {
+            background: rgba(124, 92, 252, 0.55);
+        }
+        .heatmap-legend .legend-swatch.l4 {
+            background: rgba(124, 92, 252, 0.80);
+        }
+
+        /* ============================================================
+                   SETTINGS / PROFILE
+                   ============================================================ */
+        .settings-section {
+            margin-bottom: 16px;
+        }
+        .settings-section .ss-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .settings-item {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .settings-item:active {
+            transform: scale(0.98);
+        }
+        .settings-item .si-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .settings-item .si-left .si-icon {
+            font-size: 18px;
+        }
+        .settings-item .si-left .si-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .settings-item .si-right {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .settings-item.danger .si-label {
+            color: var(--red);
+        }
+        .settings-item .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            position: relative;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+        }
+        .settings-item .toggle-switch .toggle-knob {
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: var(--transition);
+        }
+        .settings-item .toggle-switch.on {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .settings-item .toggle-switch.on .toggle-knob {
+            left: 22px;
+        }
+
+        .profile-avatar-big {
+            width: 100px;
+            height: 100px;
+            margin: 8px auto;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 72px;
+            overflow: hidden;
+            filter: drop-shadow(0 8px 32px var(--accent-dim));
+        }
+        .profile-avatar-big img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .settings-avatar-upload {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .settings-avatar-upload .upload-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            padding: 8px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .settings-avatar-upload .upload-btn:hover {
+            background: var(--bg-card-hover);
+        }
+
+        /* Inline editable task item in settings */
+        .task-settings-item {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .task-settings-item input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: var(--font);
+            outline: none;
+        }
+        .task-settings-item input:focus {
+            border-bottom: 1px solid var(--accent);
+        }
+        .task-settings-item .task-remove {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+        .task-settings-item .task-remove:hover {
+            color: var(--red);
+        }
+
+        /* ============================================================
+                   INSTALL MODAL
+                   ============================================================ */
+        #installModal {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        #installModal.active {
+            display: flex;
+        }
+        .install-modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-soft);
+        }
+        .install-modal-content h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        .install-modal-content p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .install-modal-content .step {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+        .install-modal-content .step .step-num {
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .install-modal-content .step .step-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .install-modal-content .step .step-text strong {
+            color: var(--text-primary);
+        }
+        .install-modal-content .close-modal-btn {
+            margin-top: 16px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .install-modal-content .close-modal-btn:hover {
+            opacity: 0.8;
+        }
+        .install-modal-content .install-trigger-btn {
+            background: var(--gold);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            color: #1e1b2e;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .install-modal-content .install-trigger-btn:hover {
+            opacity: 0.8;
+        }
+        .install-modal-content .download-btn {
+            background: var(--green);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            color: #1e1b2e;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .install-modal-content .download-btn:hover {
+            opacity: 0.8;
+        }
+        .install-modal-content .divider {
+            border: none;
+            border-top: 1px solid var(--glass-border);
+            margin: 16px 0;
+        }
+
+        /* ============================================================
+                   NAME EDIT MODAL
+                   ============================================================ */
+        #nameEditModal {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        #nameEditModal.active {
+            display: flex;
+        }
+        .name-edit-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: var(--shadow-soft);
+        }
+        .name-edit-content h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .name-edit-content input {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 16px;
+            color: var(--text-primary);
+            outline: none;
+            width: 100%;
+            font-family: var(--font);
+            transition: var(--transition);
+        }
+        .name-edit-content input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-dim);
+        }
+        .name-edit-content .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .name-edit-content .btn-group button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .name-edit-content .btn-group .save-btn {
+            background: var(--accent);
+            color: #fff;
+        }
+        .name-edit-content .btn-group .save-btn:hover {
+            opacity: 0.8;
+        }
+        .name-edit-content .btn-group .cancel-btn {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+        }
+        .name-edit-content .btn-group .cancel-btn:hover {
+            background: var(--bg-card-hover);
+        }
+
+        /* ============================================================
+                   TOAST
+                   ============================================================ */
+        #toast {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 20px;
+            font-size: 14px;
+            color: var(--text-primary);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-soft);
+            max-width: 90%;
+            text-align: center;
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ============================================================
+                   CONFETTI
+                   ============================================================ */
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 100;
+            animation: confetti-fall linear forwards;
+        }
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(90vh) rotate(720deg) scale(0.3);
+            }
+        }
+
+        /* ============================================================
+                   RESPONSIVE
+                   ============================================================ */
+        @media (min-width: 481px) {
+            #app {
+                border-radius: 28px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                height: calc(100vh - 40px);
+                max-height: 900px;
+                border: 1px solid var(--glass-border);
+            }
+            #bottom-nav {
+                border-radius: 0 0 28px 28px;
+            }
+            #installModal {
+                border-radius: 28px;
+                padding: 40px;
+            }
+            #nameEditModal {
+                border-radius: 28px;
+                padding: 40px;
+            }
+        }
+        @media (max-width: 400px) {
+            .stat-pill {
+                padding: 8px 12px;
+                min-width: 60px;
+            }
+            .stat-pill .stat-value {
+                font-size: 15px;
+            }
+            .task-card {
+                padding: 12px 14px;
+            }
+            .calendar-grid .cal-day {
+                font-size: 12px;
+            }
+            .heatmap-grid {
+                gap: 2px;
+            }
+            .heatmap-grid .heat-cell {
+                min-width: 10px;
+                min-height: 10px;
+            }
+        }
+
+        /* ============================================================
+                   UTILITY
+                   ============================================================ */
+        .hidden {
+            display: none !important;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-muted {
+            color: var(--text-muted);
+            -webkit-text-fill-color: var(--text-muted);
+        }
+        .w-full {
+            width: 100%;
+        }
+
+        /* Scrollable area inside screens */
+        .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Skeleton shimmer */
+        .shimmer {
+            background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.8s infinite;
+        }
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* Floating glow orbs */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    APP
+    ============================================================ -->
+    <div id="app" data-theme="dark">
+
+        <!-- Particle Background -->
+        <canvas id="particles-canvas"></canvas>
+
+        <!-- ============================================================
+        ONBOARDING
+        ============================================================ -->
+        <div id="onboarding" class="screen active">
+            <div class="scroll-area">
+                <!-- Step 0: Welcome + Import button -->
+                <div class="onboard-step active" data-step="0">
+                    <div class="onboard-logo">🔥</div>
+                    <div class="onboard-title">HabitForge</div>
+                    <div class="onboard-desc">Build streaks. Earn XP. Become unstoppable.</div>
+                    <!-- Import Backup button at the very beginning -->
+                    <button class="btn-secondary" onclick="document.getElementById('importOnboarding').click()" style="margin-top:8px;">
+                        🔄 Import Backup
+                    </button>
+                    <input type="file" id="importOnboarding" accept=".json" style="display:none" onchange="importBackupOnboarding(event)" />
+                    <div style="flex:1;min-height:20px;"></div>
+                    <button class="btn-primary" onclick="onboardNext()">Get Started →</button>
+                </div>
+
+                <!-- Step 1: Name -->
+                <div class="onboard-step" data-step="1">
+                    <div class="onboard-logo">👋</div>
+                    <div class="onboard-title">What's your name?</div>
+                    <div class="onboard-desc">This is how we'll greet you every day.</div>
+                    <input class="onboard-input" id="onName" placeholder="Enter your name..." maxlength="30" />
+                    <button class="btn-primary" onclick="onboardNext()">Continue →</button>
+                </div>
+
+                <!-- Step 2: Avatar -->
+                <div class="onboard-step" data-step="2">
+                    <div class="onboard-logo">🎨</div>
+                    <div class="onboard-title">Pick your avatar</div>
+                    <div class="onboard-desc">Choose a face or upload your own photo.</div>
+                    <div class="avatar-grid" id="avatarGrid">
+                        <div class="avatar-option selected" data-avatar="🧙">🧙</div>
+                        <div class="avatar-option" data-avatar="⚔️">⚔️</div>
+                        <div class="avatar-option" data-avatar="🧝">🧝</div>
+                        <div class="avatar-option" data-avatar="🦸">🦸</div>
+                        <div class="avatar-option" data-avatar="🧑‍🚀">🧑‍🚀</div>
+                        <div class="avatar-option" data-avatar="🧞">🧞</div>
+                        <div class="avatar-option" data-avatar="🐉">🐉</div>
+                        <div class="avatar-option" data-avatar="🦄">🦄</div>
+                        <div class="avatar-option" data-avatar="🌸">🌸</div>
+                        <div class="avatar-option" data-avatar="🌙">🌙</div>
+                        <div class="avatar-option" data-avatar="⭐">⭐</div>
+                        <div class="avatar-option" data-avatar="🔥">🔥</div>
+                    </div>
+                    <div class="avatar-upload-btn" onclick="document.getElementById('avatarFileInput').click()">📸 Upload your own photo</div>
+                    <input type="file" id="avatarFileInput" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)" />
+                    <button class="btn-primary" onclick="onboardNext()">Continue →</button>
+                </div>
+
+                <!-- Step 3: Tasks -->
+                <div class="onboard-step" data-step="3">
+                    <div class="onboard-logo">📋</div>
+                    <div class="onboard-title">Your daily quests</div>
+                    <div class="onboard-desc">Add the habits you want to track daily.</div>
+                    <div class="onboard-tasks-list" id="onTaskList">
+                        <div class="task-input-row">
+                            <input placeholder="e.g. Read 20 min" value="Morning Meditation" />
+                            <button class="task-remove" onclick="removeTaskRow(this)">✕</button>
+                        </div>
+                        <div class="task-input-row">
+                            <input placeholder="e.g. Exercise" value="Exercise 30 min" />
+                            <button class="task-remove" onclick="removeTaskRow(this)">✕</button>
+                        </div>
+                        <div class="task-input-row">
+                            <input placeholder="e.g. Study" value="Study 1 hour" />
+                            <button class="task-remove" onclick="removeTaskRow(this)">✕</button>
+                        </div>
+                    </div>
+                    <button class="btn-add-task" onclick="addTaskRow()">+ Add another task</button>
+                    <div style="height:12px;"></div>
+                    <button class="btn-primary" onclick="onboardNext()">Continue →</button>
+                </div>
+
+                <!-- Step 4: Golden Tasks (multiple) -->
+                <div class="onboard-step" data-step="4">
+                    <div class="onboard-logo">⭐</div>
+                    <div class="onboard-title">Golden Tasks</div>
+                    <div class="onboard-desc">Special tasks that appear on specific days. Earn bonus XP!</div>
+                    <div id="goldenTasksContainer">
+                        <!-- Golden task items will be added here -->
+                    </div>
+                    <button class="btn-add-task" onclick="addGoldenTaskOnboard()">+ Add another golden task</button>
+                    <div style="height:12px;"></div>
+                    <button class="btn-primary" onclick="finishOnboarding()">⚡ Start My Journey</button>
+                    <button class="btn-secondary" style="margin-top:8px;" onclick="skipGolden()">Skip golden tasks</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        DASHBOARD
+        ============================================================ -->
+        <div id="dashboard" class="screen">
+            <div class="scroll-area">
+                <div class="greeting">👋 Good <span id="greetingTime">day</span>, <span id="greetingName">Hero</span></div>
+                <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;" id="todayDate"></div>
+
+                <!-- Stats -->
+                <div class="stats-row" id="statsRow">
+                    <div class="stat-pill fire">
+                        <span class="stat-icon">🔥</span>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statStreak">0</span>
+                            <span class="stat-label">Day Streak</span>
+                        </div>
+                    </div>
+                    <div class="stat-pill purple">
+                        <span class="stat-icon">⚡</span>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statXP">0</span>
+                            <span class="stat-label">XP</span>
+                        </div>
+                    </div>
+                    <div class="stat-pill gold">
+                        <span class="stat-icon">🪙</span>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statCoins">0</span>
+                            <span class="stat-label">Coins</span>
+                        </div>
+                    </div>
+                    <div class="stat-pill green">
+                        <span class="stat-icon">📊</span>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statCompletion">0%</span>
+                            <span class="stat-label">Today</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quote -->
+                <div class="quote-box" id="quoteBox">
+                    “The secret of getting ahead is getting started.”
+                    <span class="quote-author">— Mark Twain</span>
+                </div>
+
+                <!-- Progress Ring -->
+                <div class="progress-ring-wrap">
+                    <canvas id="progressRing" width="144" height="144"></canvas>
+                    <div>
+                        <div class="ring-value" id="ringPercent">0%</div>
+                        <div class="ring-label">Daily progress</div>
+                    </div>
+                </div>
+
+                <!-- Task List -->
+                <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 8px;">
+                    <span style="font-weight:700;font-size:16px;color:var(--text-primary);">Today's Quests</span>
+                    <span style="font-size:12px;color:var(--text-muted);" id="taskCount">0 / 0</span>
+                </div>
+                <div class="task-list" id="taskList"></div>
+
+                <!-- Removed the old text-only golden reminder, as golden tasks now appear in the list with premium styling -->
+            </div>
+        </div>
+
+        <!-- ============================================================
+        CALENDAR
+        ============================================================ -->
+        <div id="calendar" class="screen">
+            <div class="scroll-area">
+                <div class="screen-title">📅 Calendar</div>
+                <div class="screen-sub">Track your golden days and progress</div>
+
+                <div class="calendar-header">
+                    <button class="cal-nav" onclick="calPrev()">‹</button>
+                    <span class="month-label" id="calMonthLabel">January 2025</span>
+                    <button class="cal-nav" onclick="calNext()">›</button>
+                </div>
+
+                <!-- Minimalist Calendar Grid -->
+                <div class="calendar-grid" id="calGrid"></div>
+
+                <!-- Golden Reminders -->
+                <div class="golden-reminders">
+                    <div class="gr-title">⭐ Golden Task Reminders</div>
+                    <div id="goldenRemindersList">
+                        <div class="gr-item" style="color:var(--text-muted);">No golden tasks set</div>
+                    </div>
+                </div>
+
+                <!-- Monthly Heatmap (refined) -->
+                <div class="heatmap-wrapper">
+                    <div class="heatmap-title">📊 Monthly Activity Heatmap</div>
+                    <div class="heatmap-grid" id="heatmapGrid"></div>
+                    <div class="heatmap-legend">
+                        <span class="legend-label">Less</span>
+                        <span class="legend-swatch l0"></span>
+                        <span class="legend-swatch l1"></span>
+                        <span class="legend-swatch l2"></span>
+                        <span class="legend-swatch l3"></span>
+                        <span class="legend-swatch l4"></span>
+                        <span class="legend-label">More</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        ANALYTICS
+        ============================================================ -->
+        <div id="analytics" class="screen">
+            <div class="scroll-area">
+                <div class="screen-title">📈 Analytics</div>
+                <div class="screen-sub">Your progress at a glance</div>
+
+                <div class="stats-row" style="margin-bottom:12px;">
+                    <div class="stat-pill purple" style="flex:1;">
+                        <span class="stat-icon">🏆</span>
+                        <div class="stat-info">
+                            <span class="stat-value" id="anaLongestStreak">0</span>
+                            <span class="stat-label">Longest Streak</span>
+                        </div>
+                    </div>
+                    <div class="stat-pill green" style="flex:1;">
+                        <span class="stat-icon">✅</span>
+                        <div class="stat-info">
+                            <span class="stat-value" id="anaTotalDone">0</span>
+                            <span class="stat-label">Tasks Done</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">📊 Daily Completion (Last 7 Days)</div>
+                    <canvas id="chartDaily"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">📊 Weekly Comparison</div>
+                    <canvas id="chartWeekly"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">📊 Monthly Overview</div>
+                    <canvas id="chartMonthly"></canvas>
+                </div>
+
+                <div style="margin-top:4px;font-size:13px;color:var(--text-muted);text-align:center;" id="anaStatsText">
+                    Total XP: <span id="anaTotalXP">0</span> · Coins: <span id="anaTotalCoins">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SETTINGS
+        ============================================================ -->
+        <div id="settings" class="screen">
+            <div class="scroll-area">
+                <div class="screen-title">⚙️ Settings</div>
+                <div class="screen-sub">Manage your profile and data</div>
+
+                <div class="profile-avatar-big" id="settingsAvatar">🧙</div>
+                <div style="text-align:center;font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:8px;" id="settingsName">Hero</div>
+                <div class="settings-avatar-upload">
+                    <button class="upload-btn" onclick="document.getElementById('settingsAvatarInput').click()">📸 Change avatar</button>
+                    <input type="file" id="settingsAvatarInput" accept="image/*" style="display:none" onchange="handleSettingsAvatarUpload(event)" />
+                </div>
+
+                <div class="settings-section">
+                    <div class="ss-title">Profile</div>
+                    <div class="settings-item" onclick="openNameEditor()">
+                        <div class="si-left">
+                            <span class="si-icon">✏️</span>
+                            <span class="si-label">Change name</span>
+                        </div>
+                        <div class="si-right">tap</div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="ss-title">Daily Tasks</div>
+                    <div id="settingsDailyList"></div>
+                    <button class="btn-add-task" onclick="addDailyTask()">+ Add Daily Task</button>
+                </div>
+
+                <div class="settings-section">
+                    <div class="ss-title">Golden Tasks</div>
+                    <div id="settingsGoldenList"></div>
+                    <button class="btn-add-task" onclick="addGoldenTaskSettings()">+ Add Golden Task</button>
+                </div>
+
+                <div class="settings-section">
+                    <div class="ss-title">Data</div>
+                    <div class="settings-item" onclick="exportBackup()">
+                        <div class="si-left">
+                            <span class="si-icon">📤</span>
+                            <span class="si-label">Export backup</span>
+                        </div>
+                        <div class="si-right">↓</div>
+                    </div>
+                    <div class="settings-item" onclick="document.getElementById('importFile').click()">
+                        <div class="si-left">
+                            <span class="si-icon">📥</span>
+                            <span class="si-label">Import backup</span>
+                        </div>
+                        <div class="si-right">↑</div>
+                    </div>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
+                    <div class="settings-item danger" onclick="resetApp()">
+                        <div class="si-left">
+                            <span class="si-icon">🔄</span>
+                            <span class="si-label" style="color:var(--red);">Reset everything</span>
+                        </div>
+                        <div class="si-right" style="color:var(--red);">⚠️</div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="ss-title">App</div>
+                    <div class="settings-item" onclick="installPWA()">
+                        <div class="si-left">
+                            <span class="si-icon">📱</span>
+                            <span class="si-label">Install App (PWA)</span>
+                        </div>
+                        <div class="si-right" id="pwaStatus">available</div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="si-left">
+                            <span class="si-icon">🌓</span>
+                            <span class="si-label">Day / Night mode</span>
+                        </div>
+                        <div class="toggle-switch on" id="themeToggle" onclick="toggleTheme()">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Updated footer with fire emoji -->
+                <div style="text-align:center;margin-top:24px;padding-bottom:12px;">
+                    <div style="font-size:18px;font-weight:700;color:var(--text-primary);">HabitForge 🔥</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Designed &amp; Developed by Ekansh Mishra</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        BOTTOM NAV
+        ============================================================ -->
+        <div id="bottom-nav">
+            <button class="nav-btn active" data-screen="dashboard" onclick="navigateTo('dashboard')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-btn" data-screen="calendar" onclick="navigateTo('calendar')">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">Calendar</span>
+            </button>
+            <button class="nav-btn" data-screen="analytics" onclick="navigateTo('analytics')">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">Analytics</span>
+            </button>
+            <button class="nav-btn" data-screen="settings" onclick="navigateTo('settings')">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-label">Settings</span>
+            </button>
+        </div>
+
+        <!-- ============================================================
+        TOAST
+        ============================================================ -->
+        <div id="toast"></div>
+
+        <!-- ============================================================
+        INSTALL MODAL
+        ============================================================ -->
+        <div id="installModal">
+            <div class="install-modal-content">
+                <h2>📲 Install HabitForge</h2>
+                <p>Choose an option below to get the app on your device.</p>
+
+                <!-- Option 1: Native install (if available) -->
+                <button class="install-trigger-btn" id="installTriggerBtn" style="display:none;" onclick="triggerNativeInstall()">
+                    📲 Install Now (Native)
+                </button>
+
+                <!-- Option 2: Download as HTML -->
+                <button class="download-btn" onclick="downloadApp()">
+                    📥 Download App (HTML)
+                </button>
+
+                <hr class="divider" />
+
+                <!-- Manual steps for reference -->
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Or follow these steps:</p>
+                <div class="step">
+                    <span class="step-num">1</span>
+                    <div class="step-text"><strong>Open in browser</strong> — Chrome (Android) or Safari (iOS).</div>
+                </div>
+                <div class="step">
+                    <span class="step-num">2</span>
+                    <div class="step-text"><strong>Tap the share / menu icon</strong> in the address bar.</div>
+                </div>
+                <div class="step">
+                    <span class="step-num">3</span>
+                    <div class="step-text"><strong>Select "Add to Home Screen"</strong> (or "Install App").</div>
+                </div>
+                <div class="step">
+                    <span class="step-num">4</span>
+                    <div class="step-text"><strong>Confirm</strong> — the app will be installed.</div>
+                </div>
+
+                <button class="close-modal-btn" onclick="closeInstallModal()">Got it — Close</button>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        NAME EDIT MODAL
+        ============================================================ -->
+        <div id="nameEditModal">
+            <div class="name-edit-content">
+                <h3>✏️ Change Name</h3>
+                <input type="text" id="nameEditInput" placeholder="Enter your name..." maxlength="30" />
+                <div class="btn-group">
+                    <button class="cancel-btn" onclick="closeNameEditor()">Cancel</button>
+                    <button class="save-btn" onclick="saveName()">Save</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script>
+        'use strict';
+
+        // ============================================================
+        //  STATE
+        // ============================================================
+        const STATE = {
+            userName: '',
+            userAvatar: '🧙',
+            tasks: [], // [{ id, name }]
+            goldenTasks: [], // [{ id, name, days: [0..6] }]
+            streak: 0,
+            xp: 0,
+            coins: 0,
+            history: {},
+            dailyQuotes: [
+                { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+                { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+                    author: "Winston Churchill" },
+                { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+                { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+                { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+                { text: "Quality is not an act, it is a habit.", author: "Aristotle" },
+                { text: "Small daily improvements over time lead to stunning results.", author: "Robin Sharma" },
+                { text: "You don't have to be extreme, just consistent.", author: "Unknown" },
+                { text: "The best time to start was yesterday. The next best is now.", author: "Unknown" },
+                { text: "Discipline is choosing between what you want now and what you want most.",
+                author: "Abraham Lincoln" },
+                { text: "Success is the sum of small efforts repeated day in and day out.", author: "Robert Collier" },
+                { text: "Motivation gets you started. Habit keeps you going.", author: "Jim Ryun" },
+            ],
+            theme: 'dark',
+            onboarded: false,
+            lastActiveDate: null,
+            xpLevel: 1,
+            totalTasksDone: 0,
+            longestStreak: 0,
+        };
+
+        let currentScreen = 'dashboard';
+        let calViewDate = new Date();
+        let selectedAvatar = '🧙';
+        let isInitialized = false;
+        let deferredPrompt = null; // for PWA
+
+        // ============================================================
+        //  INDEXED DB
+        // ============================================================
+        const DB_NAME = 'HabitForgeDB';
+        const DB_VERSION = 1;
+        let db = null;
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, DB_VERSION);
+                req.onupgradeneeded = (e) => {
+                    const d = e.target.result;
+                    if (!d.objectStoreNames.contains('state')) {
+                        d.createObjectStore('state', { keyPath: 'id' });
+                    }
+                };
+                req.onsuccess = (e) => { db = e.target.result;
+                    resolve(db); };
+                req.onerror = (e) => reject(e);
+            });
+        }
+
+        function saveState() {
+            if (!db) return Promise.resolve();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('state', 'readwrite');
+                const store = tx.objectStore('state');
+                const data = { id: 'appState', ...STATE, _savedAt: Date.now() };
+                const req = store.put(data);
+                req.onsuccess = () => resolve();
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        function loadState() {
+            return new Promise((resolve, reject) => {
+                if (!db) return reject('DB not open');
+                const tx = db.transaction('state', 'readonly');
+                const store = tx.objectStore('state');
+                const req = store.get('appState');
+                req.onsuccess = () => {
+                    if (req.result) {
+                        Object.assign(STATE, req.result);
+                    }
+                    resolve();
+                };
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        // ============================================================
+        //  THEME ENGINE
+        // ============================================================
+        function applyTheme(theme) {
+            const app = document.getElementById('app');
+            if (theme === 'light') {
+                app.setAttribute('data-theme', 'light');
+                STATE.theme = 'light';
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.classList.remove('on');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f5f3ff');
+            } else {
+                app.setAttribute('data-theme', 'dark');
+                STATE.theme = 'dark';
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.classList.add('on');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0a0a1a');
+            }
+            saveState().catch(() => {});
+            if (STATE.onboarded) {
+                renderAnalytics();
+            }
+        }
+
+        function toggleTheme() {
+            const newTheme = STATE.theme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+            showToast(newTheme === 'light' ? '☀️ Light mode' : '🌙 Dark mode');
+        }
+
+        // ============================================================
+        //  NAME EDITOR
+        // ============================================================
+        function openNameEditor() {
+            const modal = document.getElementById('nameEditModal');
+            const input = document.getElementById('nameEditInput');
+            input.value = STATE.userName || '';
+            modal.classList.add('active');
+            setTimeout(() => input.focus(), 100);
+        }
+
+        function closeNameEditor() {
+            document.getElementById('nameEditModal').classList.remove('active');
+        }
+
+        function saveName() {
+            const input = document.getElementById('nameEditInput');
+            const newName = input.value.trim();
+            if (!newName) {
+                showToast('Please enter a name');
+                return;
+            }
+            STATE.userName = newName;
+            saveState().then(() => {
+                renderSettings();
+                renderDashboard();
+                closeNameEditor();
+                showToast('✅ Name updated!');
+            });
+        }
+
+        // ============================================================
+        //  PWA INSTALL & DOWNLOAD
+        // ============================================================
+        function installPWA() {
+            // If already installed standalone
+            if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+                showToast('📱 App is already installed');
+                return;
+            }
+
+            // Show modal with instructions
+            const modal = document.getElementById('installModal');
+            modal.classList.add('active');
+
+            // If deferredPrompt is available, show the native install button
+            const triggerBtn = document.getElementById('installTriggerBtn');
+            if (deferredPrompt) {
+                triggerBtn.style.display = 'block';
+            } else {
+                triggerBtn.style.display = 'none';
+            }
+        }
+
+        function triggerNativeInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choice) => {
+                    if (choice.outcome === 'accepted') {
+                        showToast('📱 App installed!');
+                    } else {
+                        showToast('Installation declined');
+                    }
+                    deferredPrompt = null;
+                    closeInstallModal();
+                    updatePWAStatus();
+                });
+            }
+        }
+
+        function closeInstallModal() {
+            document.getElementById('installModal').classList.remove('active');
+        }
+
+        function updatePWAStatus() {
+            const el = document.getElementById('pwaStatus');
+            if (!el) return;
+            if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+                el.textContent = '✅ installed';
+            } else if (deferredPrompt) {
+                el.textContent = '📲 install';
+            } else {
+                el.textContent = '📲 available';
+            }
+        }
+
+        // ============================================================
+        //  DOWNLOAD APP AS HTML
+        // ============================================================
+        function downloadApp() {
+            // Capture the current HTML content
+            const htmlContent = document.documentElement.outerHTML;
+
+            // Create a Blob with the HTML
+            const blob = new Blob([
+                '<!DOCTYPE html>\n' + htmlContent
+            ], { type: 'text/html; charset=utf-8' });
+
+            // Create a download link
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'HabitForge.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('📥 App downloaded as HTML!');
+        }
+
+        // ============================================================
+        //  HELPERS
+        // ============================================================
+        function getToday() {
+            const d = new Date();
+            return d.toISOString().split('T')[0];
+        }
+
+        function getDateKey(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        function formatMonth(date) {
+            return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        }
+
+        function getDaysInMonth(year, month) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        function getFirstDayOfMonth(year, month) {
+            return new Date(year, month, 1).getDay();
+        }
+
+        // --- Get today's tasks including golden tasks ---
+        function getTodayTasks() {
+            const today = getToday();
+            const weekday = new Date().getDay();
+
+            // Start with regular tasks
+            const tasks = STATE.tasks.map(t => {
+                const done = STATE.history[today]?.[t.id] || false;
+                return { ...t, done };
+            });
+
+            // Add golden tasks if scheduled for today
+            STATE.goldenTasks.forEach(gt => {
+                if (gt.days.includes(weekday)) {
+                    const gId = 'golden_' + gt.id;
+                    const existing = tasks.find(t => t.id === gId);
+                    if (!existing) {
+                        const done = STATE.history[today]?.[gId] || false;
+                        tasks.push({
+                            id: gId,
+                            name: gt.name, // No star in name, we use styling
+                            golden: true,
+                            days: gt.days,
+                            done: done,
+                            isGolden: true,
+                            goldenId: gt.id,
+                        });
+                    } else {
+                        existing.isGolden = true;
+                        existing.golden = true;
+                        existing.goldenId = gt.id;
+                    }
+                }
+            });
+
+            return tasks;
+        }
+
+        function getCompletedCount(tasks) {
+            return tasks.filter(t => t.done).length;
+        }
+
+        function getTotalTasks() {
+            const weekday = new Date().getDay();
+            let count = STATE.tasks.length;
+            STATE.goldenTasks.forEach(gt => {
+                if (gt.days.includes(weekday)) count += 1;
+            });
+            return count;
+        }
+
+        function getCompletionRate(tasks) {
+            const total = tasks.length;
+            if (total === 0) return 0;
+            const done = tasks.filter(t => t.done).length;
+            return Math.round((done / total) * 100);
+        }
+
+        function getStreak() {
+            let streak = 0;
+            let d = new Date();
+            for (let i = 0; i < 365; i++) {
+                const key = getDateKey(d);
+                const dayTasks = STATE.history[key] || {};
+                const hasDone = Object.values(dayTasks).some(v => v === true);
+                if (hasDone) {
+                    streak++;
+                } else {
+                    const today = getToday();
+                    if (key === today) {
+                        // today might be incomplete, don't break
+                    } else {
+                        break;
+                    }
+                }
+                d.setDate(d.getDate() - 1);
+            }
+            return streak;
+        }
+
+        function getLongestStreak() {
+            let maxStreak = 0;
+            let currentStreak = 0;
+            const dates = Object.keys(STATE.history).sort();
+            for (const date of dates) {
+                const dayTasks = STATE.history[date] || {};
+                const hasDone = Object.values(dayTasks).some(v => v === true);
+                if (hasDone) {
+                    currentStreak++;
+                    maxStreak = Math.max(maxStreak, currentStreak);
+                } else {
+                    currentStreak = 0;
+                }
+            }
+            return maxStreak;
+        }
+
+        function getTotalTasksDone() {
+            let total = 0;
+            for (const date of Object.keys(STATE.history)) {
+                const day = STATE.history[date];
+                for (const key of Object.keys(day)) {
+                    if (day[key] === true) total++;
+                }
+            }
+            return total;
+        }
+
+        function getLevelForXP(xp) {
+            return Math.floor(xp / 100) + 1;
+        }
+
+        function getDailyQuote() {
+            const today = getToday();
+            const quotes = STATE.dailyQuotes;
+            const idx = today.split('-').join('').slice(-4);
+            const index = parseInt(idx, 10) % quotes.length;
+            return quotes[index] || quotes[0];
+        }
+
+        // ============================================================
+        //  AVATAR UPLOAD
+        // ============================================================
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const dataUrl = e.target.result;
+                selectedAvatar = dataUrl;
+                document.querySelectorAll('.avatar-option').forEach(el => {
+                    el.classList.remove('selected');
+                    el.innerHTML = '';
+                });
+                const grid = document.getElementById('avatarGrid');
+                const existingCustom = grid.querySelector('.avatar-option.custom');
+                if (existingCustom) existingCustom.remove();
+                const customDiv = document.createElement('div');
+                customDiv.className = 'avatar-option selected custom';
+                customDiv.dataset.avatar = dataUrl;
+                const img = document.createElement('img');
+                img.src = dataUrl;
+                img.alt = 'Custom avatar';
+                customDiv.appendChild(img);
+                grid.appendChild(customDiv);
+                document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+                customDiv.classList.add('selected');
+                showToast('📸 Avatar updated!');
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function handleSettingsAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                STATE.userAvatar = e.target.result;
+                saveState().then(() => {
+                    renderSettings();
+                    renderDashboard();
+                    showToast('📸 Avatar updated!');
+                });
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        // ============================================================
+        //  GOLDEN TASKS MANAGEMENT
+        // ============================================================
+        function createGoldenTaskHTML(id, name, days) {
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let chips = '';
+            dayNames.forEach((dayName, idx) => {
+                const selected = days && days.includes(idx) ? 'selected' : '';
+                chips += `<span class="day-chip ${selected}" data-day="${idx}">${dayName}</span>`;
+            });
+            return `
+                <div class="golden-task-item" data-golden-id="${id}">
+                    <div class="gt-row">
+                        <input type="text" placeholder="Golden task name" value="${name || ''}" class="gt-name-input" />
+                        <button class="gt-remove" onclick="removeGoldenTask('${id}')">✕</button>
+                    </div>
+                    <div class="gt-days">
+                        ${chips}
+                    </div>
+                </div>
+            `;
+        }
+
+        function addGoldenTaskOnboard() {
+            const container = document.getElementById('goldenTasksContainer');
+            const id = 'gt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            const html = createGoldenTaskHTML(id, '', []);
+            container.insertAdjacentHTML('beforeend', html);
+            container.lastElementChild.querySelectorAll('.day-chip').forEach(chip => {
+                chip.addEventListener('click', function(e) {
+                    this.classList.toggle('selected');
+                });
+            });
+        }
+
+        function removeGoldenTask(id) {
+            if (STATE.onboarded) {
+                STATE.goldenTasks = STATE.goldenTasks.filter(gt => gt.id !== id);
+                saveState().then(() => {
+                    renderSettings();
+                    renderDashboard();
+                    renderCalendar();
+                });
+                showToast('Golden task removed');
+            } else {
+                const el = document.querySelector(`.golden-task-item[data-golden-id="${id}"]`);
+                if (el) el.remove();
+            }
+        }
+
+        function collectGoldenTasksFromDOM(container) {
+            const items = container.querySelectorAll('.golden-task-item');
+            const tasks = [];
+            items.forEach(item => {
+                const id = item.dataset.goldenId;
+                const nameInput = item.querySelector('.gt-name-input');
+                const name = nameInput.value.trim();
+                const dayChips = item.querySelectorAll('.gt-days .day-chip.selected');
+                const days = Array.from(dayChips).map(chip => parseInt(chip.dataset.day, 10));
+                if (name && days.length > 0) {
+                    tasks.push({ id, name, days });
+                }
+            });
+            return tasks;
+        }
+
+        function addGoldenTaskSettings() {
+            const id = 'gt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            STATE.goldenTasks.push({ id, name: '', days: [] });
+            saveState().then(() => {
+                renderSettings();
+                renderDashboard();
+                renderCalendar();
+            });
+        }
+
+        // ============================================================
+        //  DAILY TASKS MANAGEMENT
+        // ============================================================
+        function addDailyTask() {
+            const id = 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            STATE.tasks.push({ id, name: 'New Task' });
+            saveState().then(() => {
+                renderSettings();
+                renderDashboard();
+                renderCalendar();
+            });
+        }
+
+        function removeDailyTask(id) {
+            STATE.tasks = STATE.tasks.filter(t => t.id !== id);
+            for (const date of Object.keys(STATE.history)) {
+                if (STATE.history[date][id] !== undefined) {
+                    delete STATE.history[date][id];
+                }
+            }
+            saveState().then(() => {
+                renderSettings();
+                renderDashboard();
+                renderCalendar();
+            });
+            showToast('Daily task removed');
+        }
+
+        function updateDailyTaskName(id, newName) {
+            const task = STATE.tasks.find(t => t.id === id);
+            if (task) {
+                task.name = newName;
+                saveState().then(() => {
+                    renderDashboard();
+                    renderCalendar();
+                });
+            }
+        }
+
+        // ============================================================
+        //  IMPORT / EXPORT
+        // ============================================================
+        function importBackupInternal(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.state) {
+                            reject(new Error('Invalid backup format'));
+                            return;
+                        }
+                        const s = data.state;
+                        STATE.userName = s.userName || 'Hero';
+                        STATE.userAvatar = s.userAvatar || '🧙';
+                        STATE.tasks = s.tasks || [];
+                        STATE.goldenTasks = s.goldenTasks || [];
+                        STATE.streak = s.streak || 0;
+                        STATE.xp = s.xp || 0;
+                        STATE.coins = s.coins || 0;
+                        STATE.history = s.history || {};
+                        STATE.xpLevel = s.xpLevel || 1;
+                        STATE.totalTasksDone = s.totalTasksDone || 0;
+                        STATE.longestStreak = s.longestStreak || 0;
+                        STATE.lastActiveDate = s.lastActiveDate || getToday();
+                        STATE.theme = s.theme || 'dark';
+                        resolve();
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                reader.onerror = () => reject(new Error('Failed to read file'));
+                reader.readAsText(file);
+            });
+        }
+
+        function importBackupOnboarding(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            importBackupInternal(file).then(() => {
+                STATE.onboarded = true;
+                return saveState();
+            }).then(() => {
+                applyTheme(STATE.theme);
+                // Skip onboarding and go to dashboard
+                document.getElementById('onboarding').classList.remove('active');
+                document.getElementById('dashboard').classList.add('active');
+                document.querySelector('.nav-btn[data-screen="dashboard"]').classList.add('active');
+                renderDashboard();
+                renderCalendar();
+                renderAnalytics();
+                renderSettings();
+                showToast('✅ Backup imported successfully!');
+                triggerConfetti();
+            }).catch(err => {
+                showToast('❌ Error importing backup: ' + err.message);
+                console.error(err);
+            });
+            event.target.value = '';
+        }
+
+        function importBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            importBackupInternal(file).then(() => {
+                return saveState();
+            }).then(() => {
+                applyTheme(STATE.theme);
+                renderDashboard();
+                renderCalendar();
+                renderAnalytics();
+                renderSettings();
+                showToast('✅ Backup imported successfully!');
+                triggerConfetti();
+            }).catch(err => {
+                showToast('❌ Error importing backup: ' + err.message);
+                console.error(err);
+            });
+            event.target.value = '';
+        }
+
+        function exportBackup() {
+            const data = {
+                version: 3,
+                exportedAt: new Date().toISOString(),
+                state: {
+                    userName: STATE.userName,
+                    userAvatar: STATE.userAvatar,
+                    tasks: STATE.tasks,
+                    goldenTasks: STATE.goldenTasks,
+                    streak: STATE.streak,
+                    xp: STATE.xp,
+                    coins: STATE.coins,
+                    history: STATE.history,
+                    xpLevel: STATE.xpLevel,
+                    totalTasksDone: STATE.totalTasksDone,
+                    longestStreak: STATE.longestStreak,
+                    lastActiveDate: STATE.lastActiveDate,
+                    theme: STATE.theme,
+                }
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `habitforge_backup_${getToday()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('📤 Backup exported!');
+        }
+
+        // ============================================================
+        //  RENDER FUNCTIONS
+        // ============================================================
+
+        function renderDashboard() {
+            const today = getToday();
+            const weekday = new Date().getDay();
+
+            const hour = new Date().getHours();
+            let timeGreeting = 'day';
+            if (hour < 12) timeGreeting = 'morning';
+            else if (hour < 17) timeGreeting = 'afternoon';
+            else timeGreeting = 'evening';
+            document.getElementById('greetingTime').textContent = timeGreeting;
+            document.getElementById('greetingName').textContent = STATE.userName || 'Hero';
+            document.getElementById('todayDate').textContent = formatDate(new Date());
+
+            // Get tasks including golden
+            const tasks = getTodayTasks();
+            const totalTasks = tasks.length;
+            const doneCount = getCompletedCount(tasks);
+            const completion = totalTasks > 0 ? Math.round((doneCount / totalTasks) * 100) : 0;
+
+            document.getElementById('statStreak').textContent = STATE.streak;
+            document.getElementById('statXP').textContent = STATE.xp;
+            document.getElementById('statCoins').textContent = STATE.coins;
+            document.getElementById('statCompletion').textContent = completion + '%';
+
+            const quote = getDailyQuote();
+            document.getElementById('quoteBox').innerHTML =
+                `“${quote.text}” <span class="quote-author">— ${quote.author}</span>`;
+
+            drawProgressRing(completion);
+            document.getElementById('ringPercent').textContent = completion + '%';
+
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            if (tasks.length === 0) {
+                taskList.innerHTML =
+                '<div style="color:var(--text-muted);font-size:14px;padding:12px 0;text-align:center;">All caught up! 🎉</div>';
+            } else {
+                tasks.forEach(task => {
+                    const card = document.createElement('div');
+                    const isGolden = task.isGolden || task.golden;
+                    card.className = `task-card ${task.done ? 'done' : ''}`;
+                    if (isGolden) {
+                        card.classList.add('golden');
+                    }
+                    card.dataset.taskId = task.id;
+
+                    const xpReward = isGolden ? 25 : 10;
+                    const coinReward = isGolden ? 5 : 2;
+
+                    card.innerHTML = `
+                        <div class="task-check">${task.done ? '✓' : ''}</div>
+                        <div class="task-info">
+                          <div class="task-name">${task.name}</div>
+                          <div class="task-meta">
+                            ${isGolden ? '<span class="gold-badge">⭐ Golden</span>' : ''}
+                            <span>+${xpReward} XP</span>
+                            <span>+${coinReward} 🪙</span>
+                          </div>
+                        </div>
+                        <div class="task-xp">${task.done ? '✓' : '⚡'}</div>
+                        <div class="task-glow"></div>
+                      `;
+                    card.addEventListener('click', () => toggleTask(task.id));
+                    taskList.appendChild(card);
+                });
+            }
+
+            document.getElementById('taskCount').textContent = `${doneCount} / ${totalTasks}`;
+
+            STATE.streak = getStreak();
+            STATE.longestStreak = Math.max(STATE.longestStreak || 0, STATE.streak);
+            STATE.totalTasksDone = getTotalTasksDone();
+            saveState();
+        }
+
+        function drawProgressRing(percent) {
+            const canvas = document.getElementById('progressRing');
+            const ctx = canvas.getContext('2d');
+            const size = 144;
+            const center = size / 2;
+            const radius = 60;
+            const lineWidth = 12;
+
+            ctx.clearRect(0, 0, size, size);
+
+            ctx.beginPath();
+            ctx.arc(center, center, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+
+            const start = -Math.PI / 2;
+            const end = start + (Math.PI * 2 * (percent / 100));
+            const gradient = ctx.createConicGradient(0, center, center);
+            gradient.addColorStop(0, '#7c5cfc');
+            gradient.addColorStop(0.5, '#a78bfa');
+            gradient.addColorStop(1, '#7c5cfc');
+
+            ctx.beginPath();
+            ctx.arc(center, center, radius, start, end);
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = lineWidth;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            ctx.shadowColor = 'rgba(124,92,252,0.3)';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(center, center, radius, start, end);
+            ctx.strokeStyle = 'rgba(124,92,252,0.1)';
+            ctx.lineWidth = lineWidth + 8;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+
+        // ============================================================
+        //  CALENDAR RENDER — simple & clean
+        // ============================================================
+        function renderCalendar() {
+            const year = calViewDate.getFullYear();
+            const month = calViewDate.getMonth();
+            document.getElementById('calMonthLabel').textContent = formatMonth(calViewDate);
+
+            const grid = document.getElementById('calGrid');
+            grid.innerHTML = '';
+
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(name => {
+                const el = document.createElement('div');
+                el.className = 'cal-day-name';
+                el.textContent = name;
+                grid.appendChild(el);
+            });
+
+            const firstDay = getFirstDayOfMonth(year, month);
+            const daysInMonth = getDaysInMonth(year, month);
+            const today = new Date();
+            const todayStr = getToday();
+
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                const el = document.createElement('div');
+                el.className = 'cal-day other-month';
+                grid.appendChild(el);
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month, d);
+                const dateKey = getDateKey(dateObj);
+                const weekday = dateObj.getDay();
+                const el = document.createElement('div');
+                el.className = 'cal-day';
+                el.textContent = d;
+
+                // Today highlight
+                if (dateKey === todayStr) {
+                    el.classList.add('today');
+                }
+
+                // Golden task indicator (clean, no stars)
+                const hasGolden = STATE.goldenTasks.some(gt => gt.days.includes(weekday));
+                if (hasGolden) {
+                    el.classList.add('has-golden');
+                }
+
+                // Completed indicator (clean, no checkmarks)
+                const dayHistory = STATE.history[dateKey] || {};
+                const hasDone = Object.values(dayHistory).some(v => v === true);
+                if (hasDone && dateKey !== todayStr) {
+                    el.classList.add('completed');
+                }
+
+                grid.appendChild(el);
+            }
+
+            renderGoldenReminders();
+            renderHeatmap();
+        }
+
+        function renderGoldenReminders() {
+            const list = document.getElementById('goldenRemindersList');
+            list.innerHTML = '';
+            if (STATE.goldenTasks.length === 0) {
+                list.innerHTML = '<div class="gr-item" style="color:var(--text-muted);">No golden tasks set</div>';
+                return;
+            }
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            STATE.goldenTasks.forEach(gt => {
+                const daysStr = gt.days.map(d => dayNames[d]).join(', ');
+                const el = document.createElement('div');
+                el.className = 'gr-item';
+                el.innerHTML = `<span>⭐ ${gt.name}</span><span class="gr-day">${daysStr}</span>`;
+                list.appendChild(el);
+            });
+        }
+
+        // ============================================================
+        //  HEATMAP — refined compact version
+        // ============================================================
+        function renderHeatmap() {
+            const grid = document.getElementById('heatmapGrid');
+            grid.innerHTML = '';
+            const today = new Date();
+            const start = new Date(today);
+            start.setDate(start.getDate() - 89); // 90 days including today
+
+            for (let i = 0; i < 90; i++) {
+                const d = new Date(start);
+                d.setDate(d.getDate() + i);
+                const key = getDateKey(d);
+                const dayHistory = STATE.history[key] || {};
+                const totalTasks = STATE.tasks.length || 1;
+                let doneCount = 0;
+                for (const k of Object.keys(dayHistory)) {
+                    if (dayHistory[k] === true) doneCount++;
+                }
+                const rate = Math.round((doneCount / totalTasks) * 100);
+                let level = 0;
+                if (rate > 0 && rate < 25) level = 1;
+                else if (rate >= 25 && rate < 50) level = 2;
+                else if (rate >= 50 && rate < 75) level = 3;
+                else if (rate >= 75) level = 4;
+
+                const el = document.createElement('div');
+                el.className = `heat-cell level-${level}`;
+                if (key === getToday()) el.classList.add('today-heat');
+                el.title = `${formatDate(d)}: ${rate}%`;
+                grid.appendChild(el);
+            }
+        }
+
+        function renderAnalytics() {
+            const longest = getLongestStreak();
+            document.getElementById('anaLongestStreak').textContent = longest;
+
+            const totalDone = getTotalTasksDone();
+            document.getElementById('anaTotalDone').textContent = totalDone;
+            document.getElementById('anaTotalXP').textContent = STATE.xp;
+            document.getElementById('anaTotalCoins').textContent = STATE.coins;
+
+            drawDailyChart();
+            drawWeeklyChart();
+            drawMonthlyChart();
+
+            document.getElementById('anaStatsText').innerHTML =
+                `Total XP: <span id="anaTotalXP">${STATE.xp}</span> · Coins: <span id="anaTotalCoins">${STATE.coins}</span>`;
+        }
+
+        function drawDailyChart() {
+            const canvas = document.getElementById('chartDaily');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const width = canvas.parentElement.clientWidth - 24;
+            const height = 140;
+            canvas.width = width * 2;
+            canvas.height = height * 2;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.scale(2, 2);
+
+            const data = [];
+            const today = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const key = getDateKey(d);
+                const dayHistory = STATE.history[key] || {};
+                const done = Object.values(dayHistory).filter(v => v === true).length;
+                const total = STATE.tasks.length || 1;
+                data.push({ label: d.toLocaleDateString('en-US', { weekday: 'short' }), value: Math.round((done / total) *
+                        100) });
+            }
+
+            const pad = { top: 20, bottom: 24, left: 24, right: 12 };
+            const chartW = width - pad.left - pad.right;
+            const chartH = height - pad.top - pad.bottom;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const isDark = STATE.theme === 'dark';
+            const textColor = isDark ? '#a0a0c0' : '#4b456a';
+            const mutedColor = isDark ? '#606080' : '#8b86a8';
+            const bgColor = isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)';
+
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, width, height);
+
+            const maxVal = 100;
+            const barWidth = chartW / data.length * 0.6;
+            const gap = chartW / data.length;
+
+            data.forEach((item, i) => {
+                const x = pad.left + i * gap + (gap - barWidth) / 2;
+                const barH = (item.value / maxVal) * chartH;
+                const y = pad.top + chartH - barH;
+
+                const grad = ctx.createLinearGradient(x, y, x, pad.top + chartH);
+                grad.addColorStop(0, '#7c5cfc');
+                grad.addColorStop(1, isDark ? 'rgba(124,92,252,0.15)' : 'rgba(124,92,252,0.25)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.roundRect(x, y, barWidth, barH, 4);
+                ctx.fill();
+
+                ctx.fillStyle = mutedColor;
+                ctx.font = '9px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(item.label, x + barWidth / 2, height - 4);
+                ctx.fillStyle = textColor;
+                ctx.font = '7px system-ui';
+                ctx.fillText(item.value + '%', x + barWidth / 2, y - 4);
+            });
+        }
+
+        function drawWeeklyChart() {
+            const canvas = document.getElementById('chartWeekly');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const width = canvas.parentElement.clientWidth - 24;
+            const height = 140;
+            canvas.width = width * 2;
+            canvas.height = height * 2;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.scale(2, 2);
+
+            const weeks = [];
+            const today = new Date();
+            for (let w = 3; w >= 0; w--) {
+                let sum = 0;
+                let count = 0;
+                const start = new Date(today);
+                start.setDate(start.getDate() - (w * 7) - 6);
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(start);
+                    d.setDate(d.getDate() + i);
+                    const key = getDateKey(d);
+                    const dayHistory = STATE.history[key] || {};
+                    const done = Object.values(dayHistory).filter(v => v === true).length;
+                    sum += done;
+                    count += STATE.tasks.length || 1;
+                }
+                const rate = count > 0 ? Math.round((sum / count) * 100) : 0;
+                weeks.push({ label: `W${4 - w}`, value: rate });
+            }
+
+            const pad = { top: 20, bottom: 24, left: 24, right: 12 };
+            const chartW = width - pad.left - pad.right;
+            const chartH = height - pad.top - pad.bottom;
+
+            ctx.clearRect(0, 0, width, height);
+            const isDark = STATE.theme === 'dark';
+            const textColor = isDark ? '#a0a0c0' : '#4b456a';
+            const mutedColor = isDark ? '#606080' : '#8b86a8';
+            const bgColor = isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)';
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, width, height);
+
+            const maxVal = 100;
+            const barWidth = chartW / weeks.length * 0.6;
+            const gap = chartW / weeks.length;
+
+            weeks.forEach((item, i) => {
+                const x = pad.left + i * gap + (gap - barWidth) / 2;
+                const barH = (item.value / maxVal) * chartH;
+                const y = pad.top + chartH - barH;
+
+                const grad = ctx.createLinearGradient(x, y, x, pad.top + chartH);
+                grad.addColorStop(0, '#34d399');
+                grad.addColorStop(1, isDark ? 'rgba(52,211,153,0.15)' : 'rgba(52,211,153,0.25)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.roundRect(x, y, barWidth, barH, 4);
+                ctx.fill();
+
+                ctx.fillStyle = mutedColor;
+                ctx.font = '9px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(item.label, x + barWidth / 2, height - 4);
+                ctx.fillStyle = textColor;
+                ctx.font = '7px system-ui';
+                ctx.fillText(item.value + '%', x + barWidth / 2, y - 4);
+            });
+        }
+
+        function drawMonthlyChart() {
+            const canvas = document.getElementById('chartMonthly');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const width = canvas.parentElement.clientWidth - 24;
+            const height = 140;
+            canvas.width = width * 2;
+            canvas.height = height * 2;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.scale(2, 2);
+
+            const months = [];
+            const today = new Date();
+            for (let m = 5; m >= 0; m--) {
+                const d = new Date(today.getFullYear(), today.getMonth() - m, 1);
+                let sum = 0;
+                let count = 0;
+                const daysInMonth = getDaysInMonth(d.getFullYear(), d.getMonth());
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateObj = new Date(d.getFullYear(), d.getMonth(), day);
+                    const key = getDateKey(dateObj);
+                    const dayHistory = STATE.history[key] || {};
+                    const done = Object.values(dayHistory).filter(v => v === true).length;
+                    sum += done;
+                    count += STATE.tasks.length || 1;
+                }
+                const rate = count > 0 ? Math.round((sum / count) * 100) : 0;
+                months.push({ label: d.toLocaleDateString('en-US', { month: 'short' }), value: rate });
+            }
+
+            const pad = { top: 20, bottom: 24, left: 24, right: 12 };
+            const chartW = width - pad.left - pad.right;
+            const chartH = height - pad.top - pad.bottom;
+
+            ctx.clearRect(0, 0, width, height);
+            const isDark = STATE.theme === 'dark';
+            const textColor = isDark ? '#a0a0c0' : '#4b456a';
+            const mutedColor = isDark ? '#606080' : '#8b86a8';
+            const bgColor = isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)';
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, width, height);
+
+            const maxVal = 100;
+            const barWidth = chartW / months.length * 0.6;
+            const gap = chartW / months.length;
+
+            months.forEach((item, i) => {
+                const x = pad.left + i * gap + (gap - barWidth) / 2;
+                const barH = (item.value / maxVal) * chartH;
+                const y = pad.top + chartH - barH;
+
+                const grad = ctx.createLinearGradient(x, y, x, pad.top + chartH);
+                grad.addColorStop(0, '#fbbf24');
+                grad.addColorStop(1, isDark ? 'rgba(251,191,36,0.15)' : 'rgba(251,191,36,0.25)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.roundRect(x, y, barWidth, barH, 4);
+                ctx.fill();
+
+                ctx.fillStyle = mutedColor;
+                ctx.font = '9px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(item.label, x + barWidth / 2, height - 4);
+                ctx.fillStyle = textColor;
+                ctx.font = '7px system-ui';
+                ctx.fillText(item.value + '%', x + barWidth / 2, y - 4);
+            });
+        }
+
+        function renderSettings() {
+            // Avatar
+            const avatarEl = document.getElementById('settingsAvatar');
+            if (STATE.userAvatar && STATE.userAvatar.startsWith('data:image')) {
+                avatarEl.innerHTML = `<img src="${STATE.userAvatar}" alt="avatar" />`;
+            } else {
+                avatarEl.textContent = STATE.userAvatar || '🧙';
+            }
+            document.getElementById('settingsName').textContent = STATE.userName || 'Hero';
+
+            // Daily Tasks
+            const dailyList = document.getElementById('settingsDailyList');
+            dailyList.innerHTML = '';
+            if (STATE.tasks.length === 0) {
+                dailyList.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px 0;">No daily tasks</div>';
+            } else {
+                STATE.tasks.forEach(task => {
+                    const div = document.createElement('div');
+                    div.className = 'task-settings-item';
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = task.name;
+                    input.placeholder = 'Task name';
+                    input.addEventListener('change', function() {
+                        updateDailyTaskName(task.id, this.value);
+                    });
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'task-remove';
+                    removeBtn.textContent = '✕';
+                    removeBtn.onclick = function(e) {
+                        e.stopPropagation();
+                        removeDailyTask(task.id);
+                    };
+                    div.appendChild(input);
+                    div.appendChild(removeBtn);
+                    dailyList.appendChild(div);
+                });
+            }
+
+            // Golden Tasks
+            const goldenList = document.getElementById('settingsGoldenList');
+            goldenList.innerHTML = '';
+            if (STATE.goldenTasks.length === 0) {
+                goldenList.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px 0;">No golden tasks</div>';
+            } else {
+                STATE.goldenTasks.forEach(gt => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'golden-task-item';
+                    wrapper.dataset.goldenId = gt.id;
+
+                    const row = document.createElement('div');
+                    row.className = 'gt-row';
+                    const nameInput = document.createElement('input');
+                    nameInput.type = 'text';
+                    nameInput.placeholder = 'Golden task name';
+                    nameInput.value = gt.name || '';
+                    nameInput.className = 'gt-name-input';
+                    nameInput.addEventListener('change', function() {
+                        const task = STATE.goldenTasks.find(t => t.id === gt.id);
+                        if (task) {
+                            task.name = this.value;
+                            saveState().then(() => {
+                                renderDashboard();
+                                renderCalendar();
+                            });
+                        }
+                    });
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'gt-remove';
+                    removeBtn.textContent = '✕';
+                    removeBtn.onclick = function() {
+                        removeGoldenTask(gt.id);
+                    };
+                    row.appendChild(nameInput);
+                    row.appendChild(removeBtn);
+                    wrapper.appendChild(row);
+
+                    const daysDiv = document.createElement('div');
+                    daysDiv.className = 'gt-days';
+                    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    dayNames.forEach((dayName, idx) => {
+                        const chip = document.createElement('span');
+                        chip.className = 'day-chip';
+                        if (gt.days && gt.days.includes(idx)) chip.classList.add('selected');
+                        chip.dataset.day = idx;
+                        chip.textContent = dayName;
+                        chip.addEventListener('click', function() {
+                            this.classList.toggle('selected');
+                            const selected = Array.from(daysDiv.querySelectorAll('.day-chip.selected'))
+                                .map(el => parseInt(el.dataset.day, 10));
+                            const task = STATE.goldenTasks.find(t => t.id === gt.id);
+                            if (task) {
+                                task.days = selected;
+                                saveState().then(() => {
+                                    renderDashboard();
+                                    renderCalendar();
+                                });
+                            }
+                        });
+                        daysDiv.appendChild(chip);
+                    });
+                    wrapper.appendChild(daysDiv);
+                    goldenList.appendChild(wrapper);
+                });
+            }
+
+            updatePWAStatus();
+            // Sync toggle
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                if (STATE.theme === 'light') {
+                    toggle.classList.remove('on');
+                } else {
+                    toggle.classList.add('on');
+                }
+            }
+        }
+
+        // ============================================================
+        //  ACTIONS
+        // ============================================================
+
+        function toggleTask(taskId) {
+            const today = getToday();
+            if (!STATE.history[today]) STATE.history[today] = {};
+
+            const tasks = getTodayTasks();
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const current = STATE.history[today][taskId] || false;
+            const newVal = !current;
+            STATE.history[today][taskId] = newVal;
+
+            if (newVal) {
+                const isGolden = task.isGolden || task.golden;
+                const xpGain = isGolden ? 25 : 10;
+                const coinGain = isGolden ? 5 : 2;
+                STATE.xp += xpGain;
+                STATE.coins += coinGain;
+                STATE.totalTasksDone = (STATE.totalTasksDone || 0) + 1;
+                showToast(`+${xpGain} XP, +${coinGain} 🪙`);
+
+                const newLevel = getLevelForXP(STATE.xp);
+                if (newLevel > STATE.xpLevel) {
+                    STATE.xpLevel = newLevel;
+                    showToast(`🎉 Level Up! You're now level ${newLevel}!`);
+                    triggerConfetti();
+                }
+
+                const streak = getStreak();
+                if (streak > 0 && streak % 7 === 0) {
+                    showToast(`🔥 ${streak} day streak! Amazing!`);
+                    triggerConfetti();
+                }
+                if (streak > 0 && streak % 5 === 0) {
+                    STATE.coins += 10;
+                    showToast(`🎁 +10 bonus coins for ${streak} day streak!`);
+                }
+            } else {
+                const isGolden = task.isGolden || task.golden;
+                const xpGain = isGolden ? 25 : 10;
+                const coinGain = isGolden ? 5 : 2;
+                STATE.xp = Math.max(0, STATE.xp - xpGain);
+                STATE.coins = Math.max(0, STATE.coins - coinGain);
+                STATE.totalTasksDone = Math.max(0, (STATE.totalTasksDone || 0) - 1);
+            }
+
+            STATE.streak = getStreak();
+            STATE.longestStreak = Math.max(STATE.longestStreak || 0, STATE.streak);
+            STATE.xpLevel = getLevelForXP(STATE.xp);
+
+            saveState().then(() => {
+                renderDashboard();
+                renderCalendar();
+                renderAnalytics();
+            });
+        }
+
+        function navigateTo(screen) {
+            currentScreen = screen;
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById(screen).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.nav-btn[data-screen="${screen}"]`)?.classList.add('active');
+
+            switch (screen) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'calendar':
+                    renderCalendar();
+                    break;
+                case 'analytics':
+                    renderAnalytics();
+                    break;
+                case 'settings':
+                    renderSettings();
+                    break;
+            }
+        }
+
+        // ============================================================
+        //  ONBOARDING
+        // ============================================================
+        let onboardStep = 0;
+        const totalSteps = 5;
+
+        function onboardNext() {
+            const steps = document.querySelectorAll('.onboard-step');
+            const current = steps[onboardStep];
+
+            if (onboardStep === 1) {
+                const name = document.getElementById('onName').value.trim();
+                if (!name) {
+                    showToast('Please enter your name');
+                    return;
+                }
+                STATE.userName = name;
+            }
+            if (onboardStep === 2) {
+                STATE.userAvatar = selectedAvatar;
+            }
+            if (onboardStep === 3) {
+                const inputs = document.querySelectorAll('#onTaskList input');
+                const names = [];
+                inputs.forEach(inp => {
+                    const v = inp.value.trim();
+                    if (v) names.push(v);
+                });
+                if (names.length === 0) {
+                    showToast('Please add at least one task');
+                    return;
+                }
+                STATE.tasks = names.map((name, i) => ({
+                    id: 'task_' + i + '_' + Date.now(),
+                    name,
+                }));
+            }
+
+            current.classList.remove('active');
+            onboardStep++;
+            if (onboardStep >= totalSteps) {
+                finishOnboarding();
+                return;
+            }
+            steps[onboardStep].classList.add('active');
+
+            if (onboardStep === 1) {
+                document.getElementById('onName').focus();
+            }
+            if (onboardStep === 4) {
+                const container = document.getElementById('goldenTasksContainer');
+                container.innerHTML = '';
+                addGoldenTaskOnboard();
+            }
+        }
+
+        document.getElementById('avatarGrid').addEventListener('click', (e) => {
+            const option = e.target.closest('.avatar-option');
+            if (!option) return;
+            document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+            option.classList.add('selected');
+            const img = option.querySelector('img');
+            if (img) {
+                selectedAvatar = img.src;
+            } else {
+                selectedAvatar = option.dataset.avatar;
+            }
+        });
+
+        function addTaskRow() {
+            const list = document.getElementById('onTaskList');
+            const row = document.createElement('div');
+            row.className = 'task-input-row';
+            row.innerHTML = `
+                <input placeholder="e.g. Read 20 min" />
+                <button class="task-remove" onclick="removeTaskRow(this)">✕</button>
+              `;
+            list.appendChild(row);
+        }
+
+        function removeTaskRow(btn) {
+            const row = btn.closest('.task-input-row');
+            const list = document.getElementById('onTaskList');
+            if (list.children.length > 1) {
+                row.remove();
+            } else {
+                showToast('Keep at least one task');
+            }
+        }
+
+        function skipGolden() {
+            STATE.goldenTasks = [];
+            finishOnboarding();
+        }
+
+        function finishOnboarding() {
+            const container = document.getElementById('goldenTasksContainer');
+            const goldenTasks = collectGoldenTasksFromDOM(container);
+            STATE.goldenTasks = goldenTasks;
+
+            STATE.onboarded = true;
+            STATE.streak = 0;
+            STATE.xp = 0;
+            STATE.coins = 0;
+            STATE.history = {};
+            STATE.xpLevel = 1;
+            STATE.totalTasksDone = 0;
+            STATE.longestStreak = 0;
+            STATE.lastActiveDate = getToday();
+
+            saveState().then(() => {
+                document.getElementById('onboarding').classList.remove('active');
+                document.getElementById('dashboard').classList.add('active');
+                document.querySelector('.nav-btn[data-screen="dashboard"]').classList.add('active');
+                applyTheme(STATE.theme || 'dark');
+                renderDashboard();
+                showToast('🚀 Welcome to HabitForge!');
+                triggerConfetti();
+            });
+        }
+
+        // ============================================================
+        //  CALENDAR NAV
+        // ============================================================
+        function calPrev() {
+            calViewDate.setMonth(calViewDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function calNext() {
+            calViewDate.setMonth(calViewDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        // ============================================================
+        //  RESET
+        // ============================================================
+        function resetApp() {
+            if (!confirm('⚠️ This will erase ALL your data. Are you sure?')) return;
+            if (!confirm('Really? This cannot be undone.')) return;
+
+            if (db) {
+                const tx = db.transaction('state', 'readwrite');
+                const store = tx.objectStore('state');
+                store.clear();
+            }
+
+            STATE.userName = '';
+            STATE.userAvatar = '🧙';
+            STATE.tasks = [];
+            STATE.goldenTasks = [];
+            STATE.streak = 0;
+            STATE.xp = 0;
+            STATE.coins = 0;
+            STATE.history = {};
+            STATE.xpLevel = 1;
+            STATE.totalTasksDone = 0;
+            STATE.longestStreak = 0;
+            STATE.onboarded = false;
+            STATE.lastActiveDate = null;
+            STATE.theme = 'dark';
+
+            saveState().then(() => {
+                document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+                document.getElementById('onboarding').classList.add('active');
+                document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+                onboardStep = 0;
+                document.querySelectorAll('.onboard-step').forEach((el, i) => {
+                    el.classList.toggle('active', i === 0);
+                });
+                applyTheme('dark');
+                showToast('🔄 App has been reset');
+            });
+        }
+
+        // ============================================================
+        //  TOAST
+        // ============================================================
+        let toastTimeout = null;
+
+        function showToast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                el.classList.remove('show');
+            }, 2800);
+        }
+
+        // ============================================================
+        //  CONFETTI
+        // ============================================================
+        function triggerConfetti() {
+            const colors = ['#7c5cfc', '#fbbf24', '#34d399', '#f87171', '#60a5fa', '#a78bfa', '#f472b6'];
+            for (let i = 0; i < 60; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti-piece';
+                const size = 6 + Math.random() * 10;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100;
+                const delay = Math.random() * 0.8;
+                const dur = 1.2 + Math.random() * 1.2;
+                el.style.cssText = `
+                    left: ${left}%;
+                    width: ${size}px;
+                    height: ${size * 0.6}px;
+                    background: ${color};
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                    animation-delay: ${delay}s;
+                    animation-duration: ${dur}s;
+                  `;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), (delay + dur) * 1000 + 100);
+            }
+        }
+
+        // ============================================================
+        //  PARTICLES
+        // ============================================================
+        function initParticles() {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            let w, h;
+            const particles = [];
+            const count = 70;
+
+            function resize() {
+                const rect = document.getElementById('app').getBoundingClientRect();
+                w = canvas.width = rect.width;
+                h = canvas.height = rect.height;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    vx: (Math.random() - 0.5) * 0.25,
+                    vy: (Math.random() - 0.5) * 0.25,
+                    r: 1 + Math.random() * 2,
+                    a: 0.2 + Math.random() * 0.3,
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > w) p.vx *= -1;
+                    if (p.y < 0 || p.y > h) p.vy *= -1;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(124,92,252,${p.a})`;
+                    ctx.fill();
+                });
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(124,92,252,${0.06 * (1 - dist / 120)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // ============================================================
+        //  PWA / SERVICE WORKER
+        // ============================================================
+        function registerSW() {
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', e => {
+                      e.waitUntil(self.skipWaiting());
+                    });
+                    self.addEventListener('activate', e => {
+                      e.waitUntil(self.clients.claim());
+                    });
+                    self.addEventListener('fetch', e => {
+                      e.respondWith(
+                        fetch(e.request).catch(() => caches.match(e.request))
+                      );
+                    });
+                  `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl, { scope: '/' })
+                    .then(() => console.log('SW registered'))
+                    .catch(() => console.log('SW registration failed'));
+            }
+        }
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        async function init() {
+            registerSW();
+
+            try {
+                await openDB();
+                await loadState();
+            } catch (e) {
+                console.warn('DB not available, using memory state', e);
+            }
+
+            // PWA beforeinstallprompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                updatePWAStatus();
+            });
+
+            initParticles();
+
+            const today = getToday();
+            if (STATE.lastActiveDate && STATE.lastActiveDate !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yKey = getDateKey(yesterday);
+                const yHistory = STATE.history[yKey] || {};
+                const hasDone = Object.values(yHistory).some(v => v === true);
+                if (!hasDone && STATE.onboarded) {
+                    STATE.streak = 0;
+                    showToast('😅 Streak reset — keep going!');
+                }
+            }
+            STATE.lastActiveDate = today;
+
+            applyTheme(STATE.theme || 'dark');
+
+            if (STATE.onboarded && STATE.userName) {
+                document.getElementById('onboarding').classList.remove('active');
+                document.getElementById('dashboard').classList.add('active');
+                document.querySelector('.nav-btn[data-screen="dashboard"]').classList.add('active');
+                renderDashboard();
+                renderCalendar();
+                renderAnalytics();
+                renderSettings();
+            } else {
+                document.querySelectorAll('.onboard-step').forEach((el, i) => {
+                    el.classList.toggle('active', i === 0);
+                });
+                if (STATE.userName) {
+                    document.getElementById('onName').value = STATE.userName;
+                }
+                const avatarOptions = document.querySelectorAll('.avatar-option');
+                avatarOptions.forEach(el => {
+                    if (el.dataset.avatar === STATE.userAvatar) {
+                        el.classList.add('selected');
+                        selectedAvatar = STATE.userAvatar;
+                    } else {
+                        el.classList.remove('selected');
+                    }
+                });
+                if (STATE.userAvatar && STATE.userAvatar.startsWith('data:image')) {
+                    const grid = document.getElementById('avatarGrid');
+                    const existing = grid.querySelector('.avatar-option.custom');
+                    if (existing) existing.remove();
+                    const customDiv = document.createElement('div');
+                    customDiv.className = 'avatar-option selected custom';
+                    customDiv.dataset.avatar = STATE.userAvatar;
+                    const img = document.createElement('img');
+                    img.src = STATE.userAvatar;
+                    customDiv.appendChild(img);
+                    grid.appendChild(customDiv);
+                    selectedAvatar = STATE.userAvatar;
+                }
+                if (STATE.tasks.length > 0) {
+                    const list = document.getElementById('onTaskList');
+                    list.innerHTML = '';
+                    STATE.tasks.forEach(task => {
+                        const row = document.createElement('div');
+                        row.className = 'task-input-row';
+                        row.innerHTML = `
+                            <input placeholder="e.g. Read 20 min" value="${task.name}" />
+                            <button class="task-remove" onclick="removeTaskRow(this)">✕</button>
+                          `;
+                        list.appendChild(row);
+                    });
+                }
+                if (STATE.goldenTasks.length > 0) {
+                    const container = document.getElementById('goldenTasksContainer');
+                    container.innerHTML = '';
+                    STATE.goldenTasks.forEach(gt => {
+                        const html = createGoldenTaskHTML(gt.id, gt.name, gt.days);
+                        container.insertAdjacentHTML('beforeend', html);
+                        container.lastElementChild.querySelectorAll('.day-chip').forEach(chip => {
+                            chip.addEventListener('click', function() {
+                                this.classList.toggle('selected');
+                            });
+                        });
+                    });
+                } else {
+                    addGoldenTaskOnboard();
+                }
+            }
+
+            setInterval(() => {
+                saveState().catch(() => {});
+            }, 30000);
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    saveState().catch(() => {});
+                }
+            });
+
+            console.log('🔥 HabitForge initialized');
+        }
+
+        // roundRect polyfill
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
+                const r = typeof radii === 'number' ? radii : (radii || 0);
+                this.moveTo(x + r, y);
+                this.lineTo(x + w - r, y);
+                this.quadraticCurveTo(x + w, y, x + w, y + r);
+                this.lineTo(x + w, y + h - r);
+                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                this.lineTo(x + r, y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - r);
+                this.lineTo(x, y + r);
+                this.quadraticCurveTo(x, y, x + r, y);
+                this.closePath();
+                return this;
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Expose globals
+        window.navigateTo = navigateTo;
+        window.onboardNext = onboardNext;
+        window.finishOnboarding = finishOnboarding;
+        window.skipGolden = skipGolden;
+        window.addTaskRow = addTaskRow;
+        window.removeTaskRow = removeTaskRow;
+        window.toggleTask = toggleTask;
+        window.calPrev = calPrev;
+        window.calNext = calNext;
+        window.exportBackup = exportBackup;
+        window.importBackup = importBackup;
+        window.importBackupOnboarding = importBackupOnboarding;
+        window.resetApp = resetApp;
+        window.toggleTheme = toggleTheme;
+        window.installPWA = installPWA;
+        window.closeInstallModal = closeInstallModal;
+        window.triggerNativeInstall = triggerNativeInstall;
+        window.downloadApp = downloadApp;
+        window.openNameEditor = openNameEditor;
+        window.closeNameEditor = closeNameEditor;
+        window.saveName = saveName;
+        window.showToast = showToast;
+        window.triggerConfetti = triggerConfetti;
+        window.handleAvatarUpload = handleAvatarUpload;
+        window.handleSettingsAvatarUpload = handleSettingsAvatarUpload;
+        window.addGoldenTaskOnboard = addGoldenTaskOnboard;
+        window.addGoldenTaskSettings = addGoldenTaskSettings;
+        window.removeGoldenTask = removeGoldenTask;
+        window.addDailyTask = addDailyTask;
+        window.removeDailyTask = removeDailyTask;
+        window.updateDailyTaskName = updateDailyTaskName;
+    </script>
+</body>
+</html>
