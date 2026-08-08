@@ -49,7 +49,7 @@
             --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
             --transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
             --shadow-soft: 0 12px 48px rgba(0, 0, 0, 0.5);
-            --nav-bg: rgba(10, 10, 26, 0.85);
+            --nav-bg: rgba(10, 10, 26, 0.92);
             --particle-opacity: 0.5;
         }
 
@@ -74,7 +74,7 @@
             --red: #c62828;
             --red-dim: rgba(198, 40, 40, 0.12);
             --shadow-soft: 0 12px 48px rgba(109, 76, 223, 0.12);
-            --nav-bg: rgba(245, 243, 255, 0.88);
+            --nav-bg: rgba(245, 243, 255, 0.92);
             --particle-opacity: 0.2;
         }
 
@@ -131,14 +131,14 @@
         }
 
         /* ============================================================
-                   SCREENS
+                   SCREENS — now with bottom padding for fixed nav
                    ============================================================ */
         .screen {
             position: absolute;
             inset: 0;
             display: flex;
             flex-direction: column;
-            padding: 20px 16px 80px;
+            padding: 20px 16px 80px; /* bottom padding ensures content isn't hidden behind nav */
             overflow-y: auto;
             overflow-x: hidden;
             opacity: 0;
@@ -173,14 +173,16 @@
         }
 
         /* ============================================================
-                   BOTTOM NAV
+                   BOTTOM NAV — FIXED TO BOTTOM
                    ============================================================ */
         #bottom-nav {
-            position: absolute;
+            position: fixed;
             bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 10;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            z-index: 20;
             background: var(--nav-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -191,6 +193,10 @@
             height: 68px;
             align-items: center;
             transition: background 0.4s ease, border-color 0.4s ease;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+        }
+        [data-theme="light"] #bottom-nav {
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
         }
         .nav-btn {
             background: none;
@@ -208,9 +214,10 @@
             position: relative;
             font-family: var(--font);
             min-width: 56px;
+            -webkit-tap-highlight-color: transparent;
         }
         .nav-btn .nav-icon {
-            font-size: 22px;
+            font-size: 24px;
             line-height: 1;
             transition: var(--transition);
         }
@@ -881,19 +888,16 @@
             font-weight: 600;
             background: var(--accent-dim);
         }
-        /* Clean indicator for golden days */
         .calendar-grid .cal-day.has-golden {
             background: var(--gold-dim);
             border-color: var(--gold);
             color: var(--gold);
         }
-        /* Clean indicator for completed days */
         .calendar-grid .cal-day.completed {
             background: var(--green-dim);
             border-color: var(--green);
             color: var(--green);
         }
-        /* Override for today if it also has golden/completed status */
         .calendar-grid .cal-day.today.has-golden,
         .calendar-grid .cal-day.today.completed {
             border-color: var(--accent);
@@ -911,7 +915,6 @@
             opacity: 0.35;
         }
 
-        /* Golden reminders - refined */
         .golden-reminders {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
@@ -1474,6 +1477,9 @@
             }
             #bottom-nav {
                 border-radius: 0 0 28px 28px;
+                max-width: 480px;
+                left: 50%;
+                transform: translateX(-50%);
             }
             #installModal {
                 border-radius: 28px;
@@ -1738,8 +1744,6 @@
                     <span style="font-size:12px;color:var(--text-muted);" id="taskCount">0 / 0</span>
                 </div>
                 <div class="task-list" id="taskList"></div>
-
-                <!-- Removed the old text-only golden reminder, as golden tasks now appear in the list with premium styling -->
             </div>
         </div>
 
@@ -1924,7 +1928,7 @@
         </div>
 
         <!-- ============================================================
-        BOTTOM NAV
+        BOTTOM NAV — fixed at the bottom of the viewport
         ============================================================ -->
         <div id="bottom-nav">
             <button class="nav-btn active" data-screen="dashboard" onclick="navigateTo('dashboard')">
@@ -2010,7 +2014,7 @@
     </div>
 
     <!-- ============================================================
-    JAVASCRIPT
+    JAVASCRIPT (same as before – only minor additions for robustness)
     ============================================================ -->
     <script>
         'use strict';
@@ -2227,15 +2231,10 @@
         //  DOWNLOAD APP AS HTML
         // ============================================================
         function downloadApp() {
-            // Capture the current HTML content
             const htmlContent = document.documentElement.outerHTML;
-
-            // Create a Blob with the HTML
             const blob = new Blob([
                 '<!DOCTYPE html>\n' + htmlContent
             ], { type: 'text/html; charset=utf-8' });
-
-            // Create a download link
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -2244,7 +2243,6 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-
             showToast('📥 App downloaded as HTML!');
         }
 
@@ -2281,13 +2279,11 @@
             const today = getToday();
             const weekday = new Date().getDay();
 
-            // Start with regular tasks
             const tasks = STATE.tasks.map(t => {
                 const done = STATE.history[today]?.[t.id] || false;
                 return { ...t, done };
             });
 
-            // Add golden tasks if scheduled for today
             STATE.goldenTasks.forEach(gt => {
                 if (gt.days.includes(weekday)) {
                     const gId = 'golden_' + gt.id;
@@ -2296,7 +2292,7 @@
                         const done = STATE.history[today]?.[gId] || false;
                         tasks.push({
                             id: gId,
-                            name: gt.name, // No star in name, we use styling
+                            name: gt.name,
                             golden: true,
                             days: gt.days,
                             done: done,
@@ -2605,7 +2601,6 @@
                 return saveState();
             }).then(() => {
                 applyTheme(STATE.theme);
-                // Skip onboarding and go to dashboard
                 document.getElementById('onboarding').classList.remove('active');
                 document.getElementById('dashboard').classList.add('active');
                 document.querySelector('.nav-btn[data-screen="dashboard"]').classList.add('active');
@@ -2689,7 +2684,6 @@
             document.getElementById('greetingName').textContent = STATE.userName || 'Hero';
             document.getElementById('todayDate').textContent = formatDate(new Date());
 
-            // Get tasks including golden
             const tasks = getTodayTasks();
             const totalTasks = tasks.length;
             const doneCount = getCompletedCount(tasks);
@@ -2711,7 +2705,7 @@
             taskList.innerHTML = '';
             if (tasks.length === 0) {
                 taskList.innerHTML =
-                '<div style="color:var(--text-muted);font-size:14px;padding:12px 0;text-align:center;">All caught up! 🎉</div>';
+                    '<div style="color:var(--text-muted);font-size:14px;padding:12px 0;text-align:center;">All caught up! 🎉</div>';
             } else {
                 tasks.forEach(task => {
                     const card = document.createElement('div');
@@ -2792,7 +2786,7 @@
         }
 
         // ============================================================
-        //  CALENDAR RENDER — simple & clean
+        //  CALENDAR RENDER
         // ============================================================
         function renderCalendar() {
             const year = calViewDate.getFullYear();
@@ -2815,7 +2809,6 @@
             const today = new Date();
             const todayStr = getToday();
 
-            // Empty cells before first day
             for (let i = 0; i < firstDay; i++) {
                 const el = document.createElement('div');
                 el.className = 'cal-day other-month';
@@ -2830,18 +2823,15 @@
                 el.className = 'cal-day';
                 el.textContent = d;
 
-                // Today highlight
                 if (dateKey === todayStr) {
                     el.classList.add('today');
                 }
 
-                // Golden task indicator (clean, no stars)
                 const hasGolden = STATE.goldenTasks.some(gt => gt.days.includes(weekday));
                 if (hasGolden) {
                     el.classList.add('has-golden');
                 }
 
-                // Completed indicator (clean, no checkmarks)
                 const dayHistory = STATE.history[dateKey] || {};
                 const hasDone = Object.values(dayHistory).some(v => v === true);
                 if (hasDone && dateKey !== todayStr) {
@@ -2873,14 +2863,14 @@
         }
 
         // ============================================================
-        //  HEATMAP — refined compact version
+        //  HEATMAP
         // ============================================================
         function renderHeatmap() {
             const grid = document.getElementById('heatmapGrid');
             grid.innerHTML = '';
             const today = new Date();
             const start = new Date(today);
-            start.setDate(start.getDate() - 89); // 90 days including today
+            start.setDate(start.getDate() - 89);
 
             for (let i = 0; i < 90; i++) {
                 const d = new Date(start);
@@ -3132,7 +3122,6 @@
         }
 
         function renderSettings() {
-            // Avatar
             const avatarEl = document.getElementById('settingsAvatar');
             if (STATE.userAvatar && STATE.userAvatar.startsWith('data:image')) {
                 avatarEl.innerHTML = `<img src="${STATE.userAvatar}" alt="avatar" />`;
@@ -3238,7 +3227,6 @@
             }
 
             updatePWAStatus();
-            // Sync toggle
             const toggle = document.getElementById('themeToggle');
             if (toggle) {
                 if (STATE.theme === 'light') {
