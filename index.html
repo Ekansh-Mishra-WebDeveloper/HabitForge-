@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#0a0a1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
     <title>HabitForge — Daily Tracker</title>
 
     <!-- PWA Manifest -->
@@ -13,7 +14,7 @@
 
     <style>
         /* ============================================================
-                   RESET & BASE — THEME VARIABLES
+                   MOBILE-FIRST RESET & BASE
                    ============================================================ */
         *,
         *::before,
@@ -29,7 +30,7 @@
             --bg-secondary: #12122a;
             --bg-card: rgba(255, 255, 255, 0.06);
             --bg-card-hover: rgba(255, 255, 255, 0.10);
-            --glass-border: rgba(255, 255, 255, 0.10);
+            --glass-border: rgba(255, 255, 255, 0.08);
             --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             --text-primary: #f0f0ff;
             --text-secondary: #a0a0c0;
@@ -46,14 +47,15 @@
             --radius: 20px;
             --radius-sm: 12px;
             --radius-xs: 8px;
-            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            --transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --font: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            --transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             --shadow-soft: 0 12px 48px rgba(0, 0, 0, 0.5);
             --nav-bg: rgba(10, 10, 26, 0.92);
-            --particle-opacity: 0.5;
+            --particle-opacity: 0.4;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --nav-height: 64px;
         }
 
-        /* Light theme */
         [data-theme="light"] {
             --bg-primary: #f5f3ff;
             --bg-secondary: #ede9fe;
@@ -75,22 +77,31 @@
             --red-dim: rgba(198, 40, 40, 0.12);
             --shadow-soft: 0 12px 48px rgba(109, 76, 223, 0.12);
             --nav-bg: rgba(245, 243, 255, 0.92);
-            --particle-opacity: 0.2;
+            --particle-opacity: 0.15;
         }
 
-        html,
+        html {
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
         body {
             height: 100%;
             font-family: var(--font);
             background: var(--bg-primary);
             color: var(--text-primary);
             overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
             user-select: none;
+            -webkit-user-select: none;
             transition: background 0.4s ease, color 0.4s ease;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
+
         ::-webkit-scrollbar {
-            width: 4px;
+            width: 3px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
@@ -107,12 +118,12 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            height: 100dvh;
             max-width: 480px;
             margin: 0 auto;
             background: var(--bg-primary);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 0 80px rgba(124, 92, 252, 0.06);
             transition: background 0.4s ease;
         }
 
@@ -131,23 +142,25 @@
         }
 
         /* ============================================================
-                   SCREENS — now with bottom padding for fixed nav
+                   SCREENS — mobile-optimized padding
                    ============================================================ */
         .screen {
             position: absolute;
             inset: 0;
             display: flex;
             flex-direction: column;
-            padding: 20px 16px 80px; /* bottom padding ensures content isn't hidden behind nav */
+            padding: 16px 14px calc(var(--nav-height) + 12px + var(--safe-bottom));
             overflow-y: auto;
             overflow-x: hidden;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.45s ease, transform 0.45s ease;
-            transform: translateY(12px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform: translateY(8px);
             z-index: 1;
             background: var(--bg-primary);
             scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
         }
         .screen.active {
             opacity: 1;
@@ -159,7 +172,7 @@
             font-size: 20px;
             font-weight: 700;
             letter-spacing: -0.3px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -168,12 +181,12 @@
         .screen-sub {
             font-size: 13px;
             color: var(--text-secondary);
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             -webkit-text-fill-color: var(--text-secondary);
         }
 
         /* ============================================================
-                   BOTTOM NAV — FIXED TO BOTTOM
+                   BOTTOM NAV — FIXED, MOBILE-FRIENDLY
                    ============================================================ */
         #bottom-nav {
             position: fixed;
@@ -189,43 +202,48 @@
             border-top: 1px solid var(--glass-border);
             display: flex;
             justify-content: space-around;
-            padding: 8px 0 env(safe-area-inset-bottom, 8px) 0;
-            height: 68px;
             align-items: center;
+            padding: 4px 8px calc(4px + var(--safe-bottom));
+            height: calc(var(--nav-height) + var(--safe-bottom));
             transition: background 0.4s ease, border-color 0.4s ease;
-            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.25);
+            touch-action: manipulation;
         }
         [data-theme="light"] #bottom-nav {
-            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
         }
+
         .nav-btn {
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 10px;
+            font-size: 9px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
-            padding: 4px 12px;
+            justify-content: center;
+            gap: 1px;
+            padding: 6px 10px;
+            min-height: 44px;
+            min-width: 56px;
             border-radius: var(--radius-xs);
             transition: var(--transition);
             cursor: pointer;
             position: relative;
             font-family: var(--font);
-            min-width: 56px;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         .nav-btn .nav-icon {
             font-size: 24px;
-            line-height: 1;
+            line-height: 1.2;
             transition: var(--transition);
         }
         .nav-btn .nav-label {
             font-size: 9px;
             font-weight: 600;
-            letter-spacing: 0.3px;
-            opacity: 0.7;
+            letter-spacing: 0.2px;
+            opacity: 0.6;
             transition: var(--transition);
             color: var(--text-muted);
         }
@@ -237,16 +255,16 @@
             color: var(--accent);
         }
         .nav-btn.active .nav-icon {
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
         .nav-btn::after {
             content: '';
             position: absolute;
-            top: -1px;
+            top: 0;
             left: 50%;
             transform: translateX(-50%) scaleX(0);
-            width: 32px;
-            height: 3px;
+            width: 28px;
+            height: 2.5px;
             background: var(--accent);
             border-radius: 10px;
             transition: var(--transition);
@@ -254,15 +272,18 @@
         .nav-btn.active::after {
             transform: translateX(-50%) scaleX(1);
         }
+        .nav-btn:active {
+            transform: scale(0.92);
+        }
         .nav-btn .badge-dot {
             position: absolute;
-            top: 2px;
-            right: 6px;
-            width: 8px;
-            height: 8px;
+            top: 4px;
+            right: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: var(--gold);
-            box-shadow: 0 0 12px var(--gold);
+            box-shadow: 0 0 10px var(--gold);
             animation: pulse-dot 1.8s infinite;
         }
         @keyframes pulse-dot {
@@ -278,11 +299,11 @@
         }
 
         /* ============================================================
-                   ONBOARDING
+                   ONBOARDING — mobile-optimized
                    ============================================================ */
         #onboarding {
             z-index: 20;
-            padding: 40px 24px 80px;
+            padding: 32px 20px calc(var(--nav-height) + 16px);
             background: var(--bg-primary);
             justify-content: center;
             transition: background 0.4s ease;
@@ -290,8 +311,8 @@
         #onboarding .onboard-step {
             display: none;
             flex-direction: column;
-            gap: 20px;
-            animation: fadeSlide 0.5s ease;
+            gap: 16px;
+            animation: fadeSlide 0.4s ease;
         }
         #onboarding .onboard-step.active {
             display: flex;
@@ -299,7 +320,7 @@
         @keyframes fadeSlide {
             0% {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(16px);
             }
             100% {
                 opacity: 1;
@@ -307,12 +328,12 @@
             }
         }
         .onboard-logo {
-            font-size: 48px;
+            font-size: 44px;
             text-align: center;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .onboard-title {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 800;
             text-align: center;
             background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent));
@@ -323,7 +344,7 @@
         .onboard-desc {
             text-align: center;
             color: var(--text-secondary);
-            font-size: 15px;
+            font-size: 14px;
             line-height: 1.6;
             -webkit-text-fill-color: var(--text-secondary);
         }
@@ -331,13 +352,16 @@
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 14px 18px;
+            padding: 14px 16px;
             font-size: 16px;
             color: var(--text-primary);
             outline: none;
             transition: var(--transition);
             font-family: var(--font);
             width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 48px;
         }
         .onboard-input:focus {
             border-color: var(--accent);
@@ -349,21 +373,23 @@
         .avatar-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin: 8px 0;
+            gap: 10px;
+            margin: 6px 0;
         }
         .avatar-option {
             aspect-ratio: 1;
             border-radius: var(--radius-sm);
             background: var(--bg-card);
             border: 2px solid transparent;
-            font-size: 36px;
+            font-size: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
             cursor: pointer;
             overflow: hidden;
+            min-height: 56px;
+            touch-action: manipulation;
         }
         .avatar-option img {
             width: 100%;
@@ -371,13 +397,13 @@
             object-fit: cover;
             border-radius: var(--radius-sm);
         }
-        .avatar-option:hover {
-            background: var(--bg-card-hover);
+        .avatar-option:active {
+            transform: scale(0.94);
         }
         .avatar-option.selected {
             border-color: var(--accent);
             background: var(--accent-dim);
-            box-shadow: 0 0 24px var(--accent-dim);
+            box-shadow: 0 0 20px var(--accent-dim);
         }
         .avatar-upload-btn {
             background: var(--bg-card);
@@ -390,16 +416,20 @@
             text-align: center;
             transition: var(--transition);
             font-family: var(--font);
+            touch-action: manipulation;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .avatar-upload-btn:hover {
-            border-color: var(--accent);
-            background: var(--bg-card-hover);
+        .avatar-upload-btn:active {
+            transform: scale(0.97);
         }
         .btn-primary {
             background: linear-gradient(135deg, var(--accent), #5b3fd4);
             border: none;
             border-radius: var(--radius-sm);
-            padding: 14px 24px;
+            padding: 14px 20px;
             font-size: 16px;
             font-weight: 700;
             color: #fff;
@@ -407,7 +437,10 @@
             transition: var(--transition);
             font-family: var(--font);
             width: 100%;
-            box-shadow: 0 4px 24px var(--accent-dim);
+            box-shadow: 0 4px 20px var(--accent-dim);
+            min-height: 52px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         .btn-primary:active {
             transform: scale(0.97);
@@ -428,6 +461,8 @@
             transition: var(--transition);
             font-family: var(--font);
             width: 100%;
+            min-height: 48px;
+            touch-action: manipulation;
         }
         .btn-secondary:active {
             transform: scale(0.97);
@@ -435,14 +470,14 @@
         .onboard-tasks-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin: 8px 0;
-            max-height: 200px;
+            gap: 8px;
+            margin: 6px 0;
+            max-height: 180px;
             overflow-y: auto;
         }
         .task-input-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         .task-input-row input {
@@ -450,12 +485,15 @@
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-xs);
-            padding: 10px 14px;
+            padding: 10px 12px;
             font-size: 14px;
             color: var(--text-primary);
             outline: none;
             font-family: var(--font);
             transition: var(--transition);
+            min-height: 44px;
+            -webkit-appearance: none;
+            appearance: none;
         }
         .task-input-row input:focus {
             border-color: var(--accent);
@@ -467,10 +505,15 @@
             color: var(--text-muted);
             font-size: 18px;
             cursor: pointer;
-            padding: 4px 8px;
-            transition: var(--transition);
+            padding: 8px;
+            min-width: 40px;
+            min-height: 40px;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .task-input-row .task-remove:hover {
+        .task-input-row .task-remove:active {
             color: var(--red);
         }
         .btn-add-task {
@@ -484,16 +527,17 @@
             transition: var(--transition);
             font-family: var(--font);
             width: 100%;
+            min-height: 44px;
+            touch-action: manipulation;
         }
-        .btn-add-task:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent);
+        .btn-add-task:active {
+            transform: scale(0.97);
         }
         .golden-select {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin: 4px 0 8px;
+            gap: 6px;
+            margin: 4px 0 6px;
         }
         .golden-select .day-chip {
             background: var(--bg-card);
@@ -505,28 +549,32 @@
             cursor: pointer;
             transition: var(--transition);
             font-family: var(--font);
+            touch-action: manipulation;
+            min-height: 34px;
+            display: flex;
+            align-items: center;
+        }
+        .golden-select .day-chip:active {
+            transform: scale(0.94);
         }
         .golden-select .day-chip.selected {
             background: var(--gold-dim);
             border-color: var(--gold);
             color: var(--gold);
         }
-        .golden-select .day-chip:active {
-            transform: scale(0.95);
-        }
 
         .golden-task-item {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 12px 14px;
-            margin-bottom: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
         }
         .golden-task-item .gt-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .golden-task-item .gt-row input {
             flex: 1;
@@ -538,6 +586,9 @@
             color: var(--text-primary);
             outline: none;
             font-family: var(--font);
+            min-height: 40px;
+            -webkit-appearance: none;
+            appearance: none;
         }
         .golden-task-item .gt-row input:focus {
             border-color: var(--accent);
@@ -548,15 +599,18 @@
             color: var(--text-muted);
             font-size: 18px;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 8px;
+            min-width: 40px;
+            min-height: 40px;
+            touch-action: manipulation;
         }
-        .golden-task-item .gt-remove:hover {
+        .golden-task-item .gt-remove:active {
             color: var(--red);
         }
         .golden-task-item .gt-days {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 4px;
             margin-top: 4px;
         }
         .golden-task-item .gt-days .day-chip {
@@ -569,6 +623,13 @@
             cursor: pointer;
             transition: var(--transition);
             font-family: var(--font);
+            touch-action: manipulation;
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+        }
+        .golden-task-item .gt-days .day-chip:active {
+            transform: scale(0.94);
         }
         .golden-task-item .gt-days .day-chip.selected {
             background: var(--gold-dim);
@@ -577,10 +638,10 @@
         }
 
         /* ============================================================
-                   DASHBOARD
+                   DASHBOARD — mobile-optimized
                    ============================================================ */
         #dashboard .greeting {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             margin-bottom: 2px;
             color: var(--text-primary);
@@ -592,30 +653,31 @@
             background-clip: text;
         }
         .stats-row {
-            display: flex;
-            gap: 12px;
-            margin: 12px 0 16px;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0 12px;
         }
         .stat-pill {
             background: var(--bg-card);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 10px 16px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex: 1;
-            min-width: 80px;
+            gap: 10px;
             transition: var(--transition);
+            min-height: 56px;
         }
         .stat-pill .stat-icon {
-            font-size: 20px;
+            font-size: 22px;
+            flex-shrink: 0;
         }
         .stat-pill .stat-info {
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
         .stat-pill .stat-value {
             font-size: 18px;
@@ -624,9 +686,9 @@
             color: var(--text-primary);
         }
         .stat-pill .stat-label {
-            font-size: 9px;
+            font-size: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             color: var(--text-muted);
         }
         .stat-pill.gold .stat-value {
@@ -646,14 +708,13 @@
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            font-size: 14px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
             font-style: italic;
             color: var(--text-secondary);
             text-align: center;
             backdrop-filter: blur(8px);
-            position: relative;
             -webkit-text-fill-color: var(--text-secondary);
         }
         .quote-box .quote-author {
@@ -662,7 +723,7 @@
             font-weight: 600;
             color: var(--text-muted);
             margin-top: 4px;
-            font-size: 12px;
+            font-size: 11px;
             -webkit-text-fill-color: var(--text-muted);
         }
 
@@ -670,26 +731,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
-            margin: 8px 0 16px;
+            gap: 16px;
+            margin: 6px 0 12px;
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 16px;
+            padding: 14px;
             backdrop-filter: blur(8px);
         }
         .progress-ring-wrap canvas {
-            width: 72px;
-            height: 72px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
         }
         .progress-ring-wrap .ring-label {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
             -webkit-text-fill-color: var(--text-secondary);
         }
         .progress-ring-wrap .ring-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 800;
             background: linear-gradient(135deg, var(--text-primary), var(--accent));
             -webkit-background-clip: text;
@@ -697,11 +758,11 @@
             background-clip: text;
         }
 
-        /* Task Cards */
+        /* Task Cards — mobile-optimized */
         .task-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             margin-top: 4px;
             padding-bottom: 8px;
         }
@@ -710,21 +771,23 @@
             backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 14px 16px;
+            padding: 12px 14px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             transition: var(--transition);
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            min-height: 56px;
+            touch-action: manipulation;
         }
         .task-card:active {
             transform: scale(0.98);
         }
         .task-card .task-check {
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             border: 2px solid var(--text-muted);
             display: flex;
@@ -732,7 +795,7 @@
             justify-content: center;
             flex-shrink: 0;
             transition: var(--transition);
-            font-size: 14px;
+            font-size: 13px;
             color: transparent;
         }
         .task-card.done .task-check {
@@ -745,35 +808,33 @@
             min-width: 0;
         }
         .task-card .task-name {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             transition: var(--transition);
             color: var(--text-primary);
+            word-break: break-word;
         }
         .task-card.done .task-name {
             text-decoration: line-through;
             color: var(--text-muted);
         }
         .task-card .task-meta {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
             margin-top: 2px;
+            flex-wrap: wrap;
         }
         .task-card .task-meta .gold-badge {
             color: var(--gold);
             font-weight: 600;
         }
         .task-card .task-xp {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--accent);
-            flex-shrink: 0;
-        }
-        .task-card .task-streak-fire {
-            font-size: 16px;
             flex-shrink: 0;
         }
         .task-card .task-glow {
@@ -788,7 +849,7 @@
             opacity: 1;
         }
 
-        /* ---- Elegant Golden Task Styling ---- */
+        /* Golden task styling */
         .task-card.golden {
             border-color: var(--gold-dim);
             background: var(--gold-dim);
@@ -816,21 +877,21 @@
         }
 
         /* ============================================================
-                   CALENDAR — SIMPLE & CLEAN
+                   CALENDAR — mobile-optimized
                    ============================================================ */
         .calendar-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
-            padding-bottom: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
             border-bottom: 1px solid var(--glass-border);
         }
         .calendar-header .month-label {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
             color: var(--text-primary);
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
         }
         .calendar-header .cal-nav {
             background: transparent;
@@ -843,28 +904,31 @@
             transition: var(--transition);
             font-family: var(--font);
             background: var(--bg-card);
-        }
-        .calendar-header .cal-nav:hover {
-            background: var(--bg-card-hover);
+            min-height: 36px;
+            min-width: 40px;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .calendar-header .cal-nav:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
-            margin-bottom: 16px;
+            gap: 2px;
+            margin-bottom: 12px;
         }
         .calendar-grid .cal-day-name {
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 6px 0;
+            letter-spacing: 0.4px;
+            padding: 4px 0;
             opacity: 0.7;
         }
         .calendar-grid .cal-day {
@@ -873,7 +937,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 400;
             color: var(--text-secondary);
             background: transparent;
@@ -881,6 +945,7 @@
             transition: var(--transition);
             cursor: default;
             position: relative;
+            min-height: 32px;
         }
         .calendar-grid .cal-day.today {
             border-color: var(--accent);
@@ -905,34 +970,34 @@
             color: var(--text-primary);
         }
         .calendar-grid .cal-day.other-month {
-            opacity: 0.25;
+            opacity: 0.2;
             color: var(--text-muted);
         }
         .calendar-grid .cal-day.other-month.has-golden {
-            opacity: 0.35;
+            opacity: 0.3;
         }
         .calendar-grid .cal-day.other-month.completed {
-            opacity: 0.35;
+            opacity: 0.3;
         }
 
         .golden-reminders {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 14px 16px;
-            margin-top: 8px;
+            padding: 12px 14px;
+            margin-top: 6px;
         }
         .golden-reminders .gr-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--gold);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .golden-reminders .gr-item {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
-            font-size: 13px;
+            padding: 5px 0;
+            font-size: 12px;
             border-bottom: 1px solid var(--glass-border);
             color: var(--text-secondary);
         }
@@ -941,64 +1006,64 @@
         }
         .golden-reminders .gr-item .gr-day {
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: 10px;
         }
 
         /* ============================================================
-                   ANALYTICS
+                   ANALYTICS — mobile-optimized
                    ============================================================ */
         .chart-container {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 14px 12px;
-            margin-bottom: 14px;
+            padding: 12px 10px;
+            margin-bottom: 12px;
             backdrop-filter: blur(8px);
         }
         .chart-container .chart-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text-secondary);
         }
         .chart-container canvas {
             width: 100% !important;
-            height: 140px !important;
+            height: 120px !important;
             border-radius: var(--radius-xs);
         }
 
         /* ============================================================
-                   HEATMAP — Refined, smaller, professional
+                   HEATMAP — mobile-optimized
                    ============================================================ */
         .heatmap-wrapper {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 14px 12px;
-            margin-top: 8px;
+            padding: 12px 10px;
+            margin-top: 6px;
             backdrop-filter: blur(8px);
         }
         .heatmap-wrapper .heatmap-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .heatmap-grid {
             display: grid;
             grid-template-columns: repeat(15, 1fr);
-            gap: 3px;
-            margin-bottom: 6px;
+            gap: 2px;
+            margin-bottom: 4px;
         }
         .heatmap-grid .heat-cell {
             aspect-ratio: 1;
-            border-radius: 3px;
+            border-radius: 2px;
             background: var(--bg-card);
             border: 1px solid transparent;
             transition: var(--transition);
             cursor: default;
-            min-width: 14px;
-            min-height: 14px;
+            min-width: 12px;
+            min-height: 12px;
         }
         .heatmap-grid .heat-cell.level-0 {
             background: var(--bg-card);
@@ -1028,17 +1093,17 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 4px;
-            font-size: 9px;
+            gap: 3px;
+            font-size: 8px;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 3px;
         }
         .heatmap-legend .legend-label {
-            margin-right: 4px;
+            margin-right: 3px;
         }
         .heatmap-legend .legend-swatch {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 2px;
             border: 1px solid var(--glass-border);
         }
@@ -1059,28 +1124,30 @@
         }
 
         /* ============================================================
-                   SETTINGS / PROFILE
+                   SETTINGS — mobile-optimized
                    ============================================================ */
         .settings-section {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
         .settings-section .ss-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .settings-item {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-xs);
-            padding: 12px 16px;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             transition: var(--transition);
             cursor: pointer;
+            min-height: 48px;
+            touch-action: manipulation;
         }
         .settings-item:active {
             transform: scale(0.98);
@@ -1088,19 +1155,19 @@
         .settings-item .si-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
         .settings-item .si-left .si-icon {
             font-size: 18px;
         }
         .settings-item .si-left .si-label {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: var(--text-primary);
         }
         .settings-item .si-right {
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 12px;
         }
         .settings-item.danger .si-label {
             color: var(--red);
@@ -1114,6 +1181,7 @@
             transition: var(--transition);
             cursor: pointer;
             border: 1px solid var(--glass-border);
+            flex-shrink: 0;
         }
         .settings-item .toggle-switch .toggle-knob {
             width: 18px;
@@ -1134,18 +1202,18 @@
         }
 
         .profile-avatar-big {
-            width: 100px;
-            height: 100px;
-            margin: 8px auto;
+            width: 88px;
+            height: 88px;
+            margin: 6px auto;
             border-radius: 50%;
             background: var(--bg-card);
             border: 3px solid var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 72px;
+            font-size: 64px;
             overflow: hidden;
-            filter: drop-shadow(0 8px 32px var(--accent-dim));
+            filter: drop-shadow(0 8px 24px var(--accent-dim));
         }
         .profile-avatar-big img {
             width: 100%;
@@ -1154,42 +1222,47 @@
         }
         .settings-avatar-upload {
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
         .settings-avatar-upload .upload-btn {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-xs);
             padding: 8px 16px;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
             cursor: pointer;
             transition: var(--transition);
             font-family: var(--font);
+            min-height: 40px;
+            touch-action: manipulation;
         }
-        .settings-avatar-upload .upload-btn:hover {
-            background: var(--bg-card-hover);
+        .settings-avatar-upload .upload-btn:active {
+            transform: scale(0.96);
         }
 
-        /* Inline editable task item in settings */
         .task-settings-item {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-xs);
-            padding: 10px 14px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 6px;
+            gap: 8px;
+            margin-bottom: 4px;
+            min-height: 44px;
         }
         .task-settings-item input {
             flex: 1;
             background: transparent;
             border: none;
             color: var(--text-primary);
-            font-size: 14px;
+            font-size: 13px;
             font-family: var(--font);
             outline: none;
+            min-height: 36px;
+            -webkit-appearance: none;
+            appearance: none;
         }
         .task-settings-item input:focus {
             border-bottom: 1px solid var(--accent);
@@ -1198,142 +1271,21 @@
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
-            padding: 0 4px;
+            padding: 4px 8px;
+            min-width: 36px;
+            min-height: 36px;
+            touch-action: manipulation;
         }
-        .task-settings-item .task-remove:hover {
+        .task-settings-item .task-remove:active {
             color: var(--red);
         }
 
         /* ============================================================
-                   INSTALL MODAL
+                   MODALS — mobile-optimized
                    ============================================================ */
-        #installModal {
-            position: absolute;
-            inset: 0;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-        #installModal.active {
-            display: flex;
-        }
-        .install-modal-content {
-            background: var(--bg-secondary);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: 24px 20px;
-            max-width: 400px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-soft);
-        }
-        .install-modal-content h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: var(--text-primary);
-        }
-        .install-modal-content p {
-            color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 12px;
-        }
-        .install-modal-content .step {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
-            align-items: flex-start;
-        }
-        .install-modal-content .step .step-num {
-            background: var(--accent);
-            color: #fff;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-        .install-modal-content .step .step-text {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        .install-modal-content .step .step-text strong {
-            color: var(--text-primary);
-        }
-        .install-modal-content .close-modal-btn {
-            margin-top: 16px;
-            background: var(--accent);
-            border: none;
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            color: #fff;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            transition: var(--transition);
-            font-family: var(--font);
-        }
-        .install-modal-content .close-modal-btn:hover {
-            opacity: 0.8;
-        }
-        .install-modal-content .install-trigger-btn {
-            background: var(--gold);
-            border: none;
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            color: #1e1b2e;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-            transition: var(--transition);
-            font-family: var(--font);
-        }
-        .install-modal-content .install-trigger-btn:hover {
-            opacity: 0.8;
-        }
-        .install-modal-content .download-btn {
-            background: var(--green);
-            border: none;
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            color: #1e1b2e;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-            transition: var(--transition);
-            font-family: var(--font);
-        }
-        .install-modal-content .download-btn:hover {
-            opacity: 0.8;
-        }
-        .install-modal-content .divider {
-            border: none;
-            border-top: 1px solid var(--glass-border);
-            margin: 16px 0;
-        }
-
-        /* ============================================================
-                   NAME EDIT MODAL
-                   ============================================================ */
+        #installModal,
         #nameEditModal {
             position: absolute;
             inset: 0;
@@ -1344,37 +1296,146 @@
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 20px;
         }
+        #installModal.active,
         #nameEditModal.active {
             display: flex;
         }
+        .install-modal-content,
         .name-edit-content {
             background: var(--bg-secondary);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius);
-            padding: 24px 20px;
-            max-width: 340px;
+            padding: 20px 16px;
+            max-width: 380px;
             width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow: var(--shadow-soft);
         }
-        .name-edit-content h3 {
-            color: var(--text-primary);
+        .install-modal-content h2 {
             font-size: 18px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        .install-modal-content p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .install-modal-content .step {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: flex-start;
+        }
+        .install-modal-content .step .step-num {
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .install-modal-content .step .step-text {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .install-modal-content .step .step-text strong {
+            color: var(--text-primary);
+        }
+        .install-modal-content .close-modal-btn {
+            margin-top: 14px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            font-family: var(--font);
+            min-height: 48px;
+            touch-action: manipulation;
+        }
+        .install-modal-content .close-modal-btn:active {
+            transform: scale(0.97);
+        }
+        .install-modal-content .install-trigger-btn {
+            background: var(--gold);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            color: #1e1b2e;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 6px;
+            transition: var(--transition);
+            font-family: var(--font);
+            min-height: 48px;
+            touch-action: manipulation;
+        }
+        .install-modal-content .install-trigger-btn:active {
+            transform: scale(0.97);
+        }
+        .install-modal-content .download-btn {
+            background: var(--green);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            color: #1e1b2e;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 6px;
+            transition: var(--transition);
+            font-family: var(--font);
+            min-height: 48px;
+            touch-action: manipulation;
+        }
+        .install-modal-content .download-btn:active {
+            transform: scale(0.97);
+        }
+        .install-modal-content .divider {
+            border: none;
+            border-top: 1px solid var(--glass-border);
+            margin: 14px 0;
+        }
+
+        .name-edit-content h3 {
+            color: var(--text-primary);
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 10px;
         }
         .name-edit-content input {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 12px 16px;
+            padding: 12px 14px;
             font-size: 16px;
             color: var(--text-primary);
             outline: none;
             width: 100%;
             font-family: var(--font);
             transition: var(--transition);
+            min-height: 48px;
+            -webkit-appearance: none;
+            appearance: none;
         }
         .name-edit-content input:focus {
             border-color: var(--accent);
@@ -1382,8 +1443,8 @@
         }
         .name-edit-content .btn-group {
             display: flex;
-            gap: 10px;
-            margin-top: 14px;
+            gap: 8px;
+            margin-top: 12px;
         }
         .name-edit-content .btn-group button {
             flex: 1;
@@ -1395,45 +1456,51 @@
             cursor: pointer;
             transition: var(--transition);
             font-family: var(--font);
+            min-height: 44px;
+            touch-action: manipulation;
         }
         .name-edit-content .btn-group .save-btn {
             background: var(--accent);
             color: #fff;
         }
-        .name-edit-content .btn-group .save-btn:hover {
-            opacity: 0.8;
+        .name-edit-content .btn-group .save-btn:active {
+            transform: scale(0.97);
         }
         .name-edit-content .btn-group .cancel-btn {
             background: var(--bg-card);
             color: var(--text-secondary);
             border: 1px solid var(--glass-border);
         }
-        .name-edit-content .btn-group .cancel-btn:hover {
-            background: var(--bg-card-hover);
+        .name-edit-content .btn-group .cancel-btn:active {
+            transform: scale(0.97);
         }
 
         /* ============================================================
-                   TOAST
+                   TOAST — mobile-optimized
                    ============================================================ */
         #toast {
-            position: absolute;
-            bottom: 90px;
+            position: fixed;
+            bottom: calc(var(--nav-height) + 16px + var(--safe-bottom));
             left: 50%;
             transform: translateX(-50%) translateY(20px);
             background: var(--bg-card);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-sm);
-            padding: 12px 20px;
-            font-size: 14px;
+            padding: 10px 18px;
+            font-size: 13px;
             color: var(--text-primary);
             z-index: 50;
             opacity: 0;
             pointer-events: none;
             transition: var(--transition);
             box-shadow: var(--shadow-soft);
-            max-width: 90%;
+            max-width: 88%;
             text-align: center;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         #toast.show {
             opacity: 1;
@@ -1446,8 +1513,8 @@
                    ============================================================ */
         .confetti-piece {
             position: fixed;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             pointer-events: none;
             z-index: 100;
             animation: confetti-fall linear forwards;
@@ -1464,14 +1531,61 @@
         }
 
         /* ============================================================
-                   RESPONSIVE
+                   RESPONSIVE BREAKPOINTS
                    ============================================================ */
+        @media (max-width: 380px) {
+            .stat-pill {
+                padding: 8px 10px;
+            }
+            .stat-pill .stat-value {
+                font-size: 16px;
+            }
+            .task-card {
+                padding: 10px 12px;
+                min-height: 48px;
+            }
+            .calendar-grid .cal-day {
+                font-size: 11px;
+                min-height: 28px;
+            }
+            .heatmap-grid .heat-cell {
+                min-width: 10px;
+                min-height: 10px;
+            }
+            .screen {
+                padding: 12px 10px calc(var(--nav-height) + 10px + var(--safe-bottom));
+            }
+            #onboarding {
+                padding: 24px 14px calc(var(--nav-height) + 12px);
+            }
+            .nav-btn {
+                min-width: 48px;
+                padding: 4px 6px;
+            }
+            .nav-btn .nav-icon {
+                font-size: 20px;
+            }
+            .install-modal-content {
+                padding: 16px 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .avatar-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+        }
+
         @media (min-width: 481px) {
             #app {
                 border-radius: 28px;
-                margin-top: 20px;
-                margin-bottom: 20px;
-                height: calc(100vh - 40px);
+                margin-top: 16px;
+                margin-bottom: 16px;
+                height: calc(100vh - 32px);
                 max-height: 900px;
                 border: 1px solid var(--glass-border);
             }
@@ -1481,35 +1595,16 @@
                 left: 50%;
                 transform: translateX(-50%);
             }
-            #installModal {
-                border-radius: 28px;
-                padding: 40px;
-            }
+            #installModal,
             #nameEditModal {
                 border-radius: 28px;
-                padding: 40px;
+                padding: 32px;
             }
-        }
-        @media (max-width: 400px) {
-            .stat-pill {
-                padding: 8px 12px;
-                min-width: 60px;
+            .screen {
+                padding: 20px 18px calc(var(--nav-height) + 16px + var(--safe-bottom));
             }
-            .stat-pill .stat-value {
-                font-size: 15px;
-            }
-            .task-card {
-                padding: 12px 14px;
-            }
-            .calendar-grid .cal-day {
-                font-size: 12px;
-            }
-            .heatmap-grid {
-                gap: 2px;
-            }
-            .heatmap-grid .heat-cell {
-                min-width: 10px;
-                min-height: 10px;
+            #onboarding {
+                padding: 40px 24px calc(var(--nav-height) + 20px);
             }
         }
 
@@ -1548,36 +1643,12 @@
             width: 100%;
         }
 
-        /* Scrollable area inside screens */
         .scroll-area {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 12px;
+            padding-bottom: 8px;
             -webkit-overflow-scrolling: touch;
-        }
-
-        /* Skeleton shimmer */
-        .shimmer {
-            background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.8s infinite;
-        }
-        @keyframes shimmer {
-            0% {
-                background-position: -200% 0;
-            }
-            100% {
-                background-position: 200% 0;
-            }
-        }
-
-        /* Floating glow orbs */
-        .glow-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            pointer-events: none;
-            z-index: 0;
+            overscroll-behavior: contain;
         }
     </style>
 </head>
@@ -1601,12 +1672,11 @@
                     <div class="onboard-logo">🔥</div>
                     <div class="onboard-title">HabitForge</div>
                     <div class="onboard-desc">Build streaks. Earn XP. Become unstoppable.</div>
-                    <!-- Import Backup button at the very beginning -->
-                    <button class="btn-secondary" onclick="document.getElementById('importOnboarding').click()" style="margin-top:8px;">
+                    <button class="btn-secondary" onclick="document.getElementById('importOnboarding').click()" style="margin-top:6px;">
                         🔄 Import Backup
                     </button>
                     <input type="file" id="importOnboarding" accept=".json" style="display:none" onchange="importBackupOnboarding(event)" />
-                    <div style="flex:1;min-height:20px;"></div>
+                    <div style="flex:1;min-height:12px;"></div>
                     <button class="btn-primary" onclick="onboardNext()">Get Started →</button>
                 </div>
 
@@ -1663,7 +1733,7 @@
                         </div>
                     </div>
                     <button class="btn-add-task" onclick="addTaskRow()">+ Add another task</button>
-                    <div style="height:12px;"></div>
+                    <div style="height:10px;"></div>
                     <button class="btn-primary" onclick="onboardNext()">Continue →</button>
                 </div>
 
@@ -1672,13 +1742,11 @@
                     <div class="onboard-logo">⭐</div>
                     <div class="onboard-title">Golden Tasks</div>
                     <div class="onboard-desc">Special tasks that appear on specific days. Earn bonus XP!</div>
-                    <div id="goldenTasksContainer">
-                        <!-- Golden task items will be added here -->
-                    </div>
+                    <div id="goldenTasksContainer"></div>
                     <button class="btn-add-task" onclick="addGoldenTaskOnboard()">+ Add another golden task</button>
-                    <div style="height:12px;"></div>
+                    <div style="height:10px;"></div>
                     <button class="btn-primary" onclick="finishOnboarding()">⚡ Start My Journey</button>
-                    <button class="btn-secondary" style="margin-top:8px;" onclick="skipGolden()">Skip golden tasks</button>
+                    <button class="btn-secondary" style="margin-top:6px;" onclick="skipGolden()">Skip golden tasks</button>
                 </div>
             </div>
         </div>
@@ -1689,9 +1757,8 @@
         <div id="dashboard" class="screen">
             <div class="scroll-area">
                 <div class="greeting">👋 Good <span id="greetingTime">day</span>, <span id="greetingName">Hero</span></div>
-                <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;" id="todayDate"></div>
+                <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;" id="todayDate"></div>
 
-                <!-- Stats -->
                 <div class="stats-row" id="statsRow">
                     <div class="stat-pill fire">
                         <span class="stat-icon">🔥</span>
@@ -1723,25 +1790,22 @@
                     </div>
                 </div>
 
-                <!-- Quote -->
                 <div class="quote-box" id="quoteBox">
                     “The secret of getting ahead is getting started.”
                     <span class="quote-author">— Mark Twain</span>
                 </div>
 
-                <!-- Progress Ring -->
                 <div class="progress-ring-wrap">
-                    <canvas id="progressRing" width="144" height="144"></canvas>
+                    <canvas id="progressRing" width="128" height="128"></canvas>
                     <div>
                         <div class="ring-value" id="ringPercent">0%</div>
                         <div class="ring-label">Daily progress</div>
                     </div>
                 </div>
 
-                <!-- Task List -->
-                <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 8px;">
-                    <span style="font-weight:700;font-size:16px;color:var(--text-primary);">Today's Quests</span>
-                    <span style="font-size:12px;color:var(--text-muted);" id="taskCount">0 / 0</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 6px;">
+                    <span style="font-weight:700;font-size:15px;color:var(--text-primary);">Today's Quests</span>
+                    <span style="font-size:11px;color:var(--text-muted);" id="taskCount">0 / 0</span>
                 </div>
                 <div class="task-list" id="taskList"></div>
             </div>
@@ -1761,10 +1825,8 @@
                     <button class="cal-nav" onclick="calNext()">›</button>
                 </div>
 
-                <!-- Minimalist Calendar Grid -->
                 <div class="calendar-grid" id="calGrid"></div>
 
-                <!-- Golden Reminders -->
                 <div class="golden-reminders">
                     <div class="gr-title">⭐ Golden Task Reminders</div>
                     <div id="goldenRemindersList">
@@ -1772,7 +1834,6 @@
                     </div>
                 </div>
 
-                <!-- Monthly Heatmap (refined) -->
                 <div class="heatmap-wrapper">
                     <div class="heatmap-title">📊 Monthly Activity Heatmap</div>
                     <div class="heatmap-grid" id="heatmapGrid"></div>
@@ -1797,7 +1858,7 @@
                 <div class="screen-title">📈 Analytics</div>
                 <div class="screen-sub">Your progress at a glance</div>
 
-                <div class="stats-row" style="margin-bottom:12px;">
+                <div class="stats-row" style="margin-bottom:10px;">
                     <div class="stat-pill purple" style="flex:1;">
                         <span class="stat-icon">🏆</span>
                         <div class="stat-info">
@@ -1829,7 +1890,7 @@
                     <canvas id="chartMonthly"></canvas>
                 </div>
 
-                <div style="margin-top:4px;font-size:13px;color:var(--text-muted);text-align:center;" id="anaStatsText">
+                <div style="margin-top:4px;font-size:12px;color:var(--text-muted);text-align:center;" id="anaStatsText">
                     Total XP: <span id="anaTotalXP">0</span> · Coins: <span id="anaTotalCoins">0</span>
                 </div>
             </div>
@@ -1844,7 +1905,7 @@
                 <div class="screen-sub">Manage your profile and data</div>
 
                 <div class="profile-avatar-big" id="settingsAvatar">🧙</div>
-                <div style="text-align:center;font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:8px;" id="settingsName">Hero</div>
+                <div style="text-align:center;font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:6px;" id="settingsName">Hero</div>
                 <div class="settings-avatar-upload">
                     <button class="upload-btn" onclick="document.getElementById('settingsAvatarInput').click()">📸 Change avatar</button>
                     <input type="file" id="settingsAvatarInput" accept="image/*" style="display:none" onchange="handleSettingsAvatarUpload(event)" />
@@ -1919,16 +1980,15 @@
                     </div>
                 </div>
 
-                <!-- Updated footer with fire emoji -->
-                <div style="text-align:center;margin-top:24px;padding-bottom:12px;">
-                    <div style="font-size:18px;font-weight:700;color:var(--text-primary);">HabitForge 🔥</div>
-                    <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Designed &amp; Developed by Ekansh Mishra</div>
+                <div style="text-align:center;margin-top:20px;padding-bottom:8px;">
+                    <div style="font-size:17px;font-weight:700;color:var(--text-primary);">HabitForge 🔥</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Designed &amp; Developed by Ekansh Mishra</div>
                 </div>
             </div>
         </div>
 
         <!-- ============================================================
-        BOTTOM NAV — fixed at the bottom of the viewport
+        BOTTOM NAV — FIXED
         ============================================================ -->
         <div id="bottom-nav">
             <button class="nav-btn active" data-screen="dashboard" onclick="navigateTo('dashboard')">
@@ -1955,27 +2015,20 @@
         <div id="toast"></div>
 
         <!-- ============================================================
-        INSTALL MODAL
+        MODALS
         ============================================================ -->
         <div id="installModal">
             <div class="install-modal-content">
                 <h2>📲 Install HabitForge</h2>
                 <p>Choose an option below to get the app on your device.</p>
-
-                <!-- Option 1: Native install (if available) -->
                 <button class="install-trigger-btn" id="installTriggerBtn" style="display:none;" onclick="triggerNativeInstall()">
                     📲 Install Now (Native)
                 </button>
-
-                <!-- Option 2: Download as HTML -->
                 <button class="download-btn" onclick="downloadApp()">
                     📥 Download App (HTML)
                 </button>
-
                 <hr class="divider" />
-
-                <!-- Manual steps for reference -->
-                <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Or follow these steps:</p>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Or follow these steps:</p>
                 <div class="step">
                     <span class="step-num">1</span>
                     <div class="step-text"><strong>Open in browser</strong> — Chrome (Android) or Safari (iOS).</div>
@@ -1992,14 +2045,10 @@
                     <span class="step-num">4</span>
                     <div class="step-text"><strong>Confirm</strong> — the app will be installed.</div>
                 </div>
-
                 <button class="close-modal-btn" onclick="closeInstallModal()">Got it — Close</button>
             </div>
         </div>
 
-        <!-- ============================================================
-        NAME EDIT MODAL
-        ============================================================ -->
         <div id="nameEditModal">
             <div class="name-edit-content">
                 <h3>✏️ Change Name</h3>
@@ -2014,7 +2063,7 @@
     </div>
 
     <!-- ============================================================
-    JAVASCRIPT (same as before – only minor additions for robustness)
+    JAVASCRIPT — full app logic
     ============================================================ -->
     <script>
         'use strict';
@@ -2025,8 +2074,8 @@
         const STATE = {
             userName: '',
             userAvatar: '🧙',
-            tasks: [], // [{ id, name }]
-            goldenTasks: [], // [{ id, name, days: [0..6] }]
+            tasks: [],
+            goldenTasks: [],
             streak: 0,
             xp: 0,
             coins: 0,
@@ -2043,7 +2092,7 @@
                 { text: "You don't have to be extreme, just consistent.", author: "Unknown" },
                 { text: "The best time to start was yesterday. The next best is now.", author: "Unknown" },
                 { text: "Discipline is choosing between what you want now and what you want most.",
-                author: "Abraham Lincoln" },
+                    author: "Abraham Lincoln" },
                 { text: "Success is the sum of small efforts repeated day in and day out.", author: "Robert Collier" },
                 { text: "Motivation gets you started. Habit keeps you going.", author: "Jim Ryun" },
             ],
@@ -2058,15 +2107,14 @@
         let currentScreen = 'dashboard';
         let calViewDate = new Date();
         let selectedAvatar = '🧙';
-        let isInitialized = false;
-        let deferredPrompt = null; // for PWA
+        let deferredPrompt = null;
+        let db = null;
 
         // ============================================================
         //  INDEXED DB
         // ============================================================
         const DB_NAME = 'HabitForgeDB';
         const DB_VERSION = 1;
-        let db = null;
 
         function openDB() {
             return new Promise((resolve, reject) => {
@@ -2112,7 +2160,7 @@
         }
 
         // ============================================================
-        //  THEME ENGINE
+        //  THEME
         // ============================================================
         function applyTheme(theme) {
             const app = document.getElementById('app');
@@ -2130,9 +2178,7 @@
                 document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0a0a1a');
             }
             saveState().catch(() => {});
-            if (STATE.onboarded) {
-                renderAnalytics();
-            }
+            if (STATE.onboarded) renderAnalytics();
         }
 
         function toggleTheme() {
@@ -2146,10 +2192,9 @@
         // ============================================================
         function openNameEditor() {
             const modal = document.getElementById('nameEditModal');
-            const input = document.getElementById('nameEditInput');
-            input.value = STATE.userName || '';
+            document.getElementById('nameEditInput').value = STATE.userName || '';
             modal.classList.add('active');
-            setTimeout(() => input.focus(), 100);
+            setTimeout(() => document.getElementById('nameEditInput').focus(), 100);
         }
 
         function closeNameEditor() {
@@ -2159,10 +2204,7 @@
         function saveName() {
             const input = document.getElementById('nameEditInput');
             const newName = input.value.trim();
-            if (!newName) {
-                showToast('Please enter a name');
-                return;
-            }
+            if (!newName) { showToast('Please enter a name'); return; }
             STATE.userName = newName;
             saveState().then(() => {
                 renderSettings();
@@ -2173,37 +2215,24 @@
         }
 
         // ============================================================
-        //  PWA INSTALL & DOWNLOAD
+        //  PWA
         // ============================================================
         function installPWA() {
-            // If already installed standalone
             if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
                 showToast('📱 App is already installed');
                 return;
             }
-
-            // Show modal with instructions
-            const modal = document.getElementById('installModal');
-            modal.classList.add('active');
-
-            // If deferredPrompt is available, show the native install button
+            document.getElementById('installModal').classList.add('active');
             const triggerBtn = document.getElementById('installTriggerBtn');
-            if (deferredPrompt) {
-                triggerBtn.style.display = 'block';
-            } else {
-                triggerBtn.style.display = 'none';
-            }
+            triggerBtn.style.display = deferredPrompt ? 'block' : 'none';
         }
 
         function triggerNativeInstall() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choice) => {
-                    if (choice.outcome === 'accepted') {
-                        showToast('📱 App installed!');
-                    } else {
-                        showToast('Installation declined');
-                    }
+                    if (choice.outcome === 'accepted') showToast('📱 App installed!');
+                    else showToast('Installation declined');
                     deferredPrompt = null;
                     closeInstallModal();
                     updatePWAStatus();
@@ -2227,14 +2256,9 @@
             }
         }
 
-        // ============================================================
-        //  DOWNLOAD APP AS HTML
-        // ============================================================
         function downloadApp() {
             const htmlContent = document.documentElement.outerHTML;
-            const blob = new Blob([
-                '<!DOCTYPE html>\n' + htmlContent
-            ], { type: 'text/html; charset=utf-8' });
+            const blob = new Blob(['<!DOCTYPE html>\n' + htmlContent], { type: 'text/html; charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -2249,14 +2273,9 @@
         // ============================================================
         //  HELPERS
         // ============================================================
-        function getToday() {
-            const d = new Date();
-            return d.toISOString().split('T')[0];
-        }
+        function getToday() { return new Date().toISOString().split('T')[0]; }
 
-        function getDateKey(date) {
-            return date.toISOString().split('T')[0];
-        }
+        function getDateKey(date) { return date.toISOString().split('T')[0]; }
 
         function formatDate(date) {
             return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -2266,36 +2285,28 @@
             return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         }
 
-        function getDaysInMonth(year, month) {
-            return new Date(year, month + 1, 0).getDate();
-        }
+        function getDaysInMonth(year, month) { return new Date(year, month + 1, 0).getDate(); }
 
-        function getFirstDayOfMonth(year, month) {
-            return new Date(year, month, 1).getDay();
-        }
+        function getFirstDayOfMonth(year, month) { return new Date(year, month, 1).getDay(); }
 
-        // --- Get today's tasks including golden tasks ---
         function getTodayTasks() {
             const today = getToday();
             const weekday = new Date().getDay();
-
             const tasks = STATE.tasks.map(t => {
                 const done = STATE.history[today]?.[t.id] || false;
                 return { ...t, done };
             });
-
             STATE.goldenTasks.forEach(gt => {
                 if (gt.days.includes(weekday)) {
                     const gId = 'golden_' + gt.id;
                     const existing = tasks.find(t => t.id === gId);
                     if (!existing) {
-                        const done = STATE.history[today]?.[gId] || false;
                         tasks.push({
                             id: gId,
                             name: gt.name,
                             golden: true,
                             days: gt.days,
-                            done: done,
+                            done: STATE.history[today]?.[gId] || false,
                             isGolden: true,
                             goldenId: gt.id,
                         });
@@ -2306,46 +2317,28 @@
                     }
                 }
             });
-
             return tasks;
         }
 
-        function getCompletedCount(tasks) {
-            return tasks.filter(t => t.done).length;
-        }
+        function getCompletedCount(tasks) { return tasks.filter(t => t.done).length; }
 
         function getTotalTasks() {
             const weekday = new Date().getDay();
             let count = STATE.tasks.length;
-            STATE.goldenTasks.forEach(gt => {
-                if (gt.days.includes(weekday)) count += 1;
-            });
+            STATE.goldenTasks.forEach(gt => { if (gt.days.includes(weekday)) count += 1; });
             return count;
         }
 
-        function getCompletionRate(tasks) {
-            const total = tasks.length;
-            if (total === 0) return 0;
-            const done = tasks.filter(t => t.done).length;
-            return Math.round((done / total) * 100);
-        }
-
         function getStreak() {
-            let streak = 0;
-            let d = new Date();
+            let streak = 0,
+                d = new Date();
             for (let i = 0; i < 365; i++) {
                 const key = getDateKey(d);
                 const dayTasks = STATE.history[key] || {};
                 const hasDone = Object.values(dayTasks).some(v => v === true);
-                if (hasDone) {
-                    streak++;
-                } else {
-                    const today = getToday();
-                    if (key === today) {
-                        // today might be incomplete, don't break
-                    } else {
-                        break;
-                    }
+                if (hasDone) streak++;
+                else {
+                    if (key !== getToday()) break;
                 }
                 d.setDate(d.getDate() - 1);
             }
@@ -2353,18 +2346,14 @@
         }
 
         function getLongestStreak() {
-            let maxStreak = 0;
-            let currentStreak = 0;
+            let maxStreak = 0,
+                currentStreak = 0;
             const dates = Object.keys(STATE.history).sort();
             for (const date of dates) {
                 const dayTasks = STATE.history[date] || {};
                 const hasDone = Object.values(dayTasks).some(v => v === true);
-                if (hasDone) {
-                    currentStreak++;
-                    maxStreak = Math.max(maxStreak, currentStreak);
-                } else {
-                    currentStreak = 0;
-                }
+                if (hasDone) { currentStreak++;
+                    maxStreak = Math.max(maxStreak, currentStreak); } else { currentStreak = 0; }
             }
             return maxStreak;
         }
@@ -2373,23 +2362,17 @@
             let total = 0;
             for (const date of Object.keys(STATE.history)) {
                 const day = STATE.history[date];
-                for (const key of Object.keys(day)) {
-                    if (day[key] === true) total++;
-                }
+                for (const key of Object.keys(day)) { if (day[key] === true) total++; }
             }
             return total;
         }
 
-        function getLevelForXP(xp) {
-            return Math.floor(xp / 100) + 1;
-        }
+        function getLevelForXP(xp) { return Math.floor(xp / 100) + 1; }
 
         function getDailyQuote() {
             const today = getToday();
-            const quotes = STATE.dailyQuotes;
-            const idx = today.split('-').join('').slice(-4);
-            const index = parseInt(idx, 10) % quotes.length;
-            return quotes[index] || quotes[0];
+            const idx = parseInt(today.split('-').join('').slice(-4), 10) % STATE.dailyQuotes.length;
+            return STATE.dailyQuotes[idx] || STATE.dailyQuotes[0];
         }
 
         // ============================================================
@@ -2407,8 +2390,8 @@
                     el.innerHTML = '';
                 });
                 const grid = document.getElementById('avatarGrid');
-                const existingCustom = grid.querySelector('.avatar-option.custom');
-                if (existingCustom) existingCustom.remove();
+                const existing = grid.querySelector('.avatar-option.custom');
+                if (existing) existing.remove();
                 const customDiv = document.createElement('div');
                 customDiv.className = 'avatar-option selected custom';
                 customDiv.dataset.avatar = dataUrl;
@@ -2442,7 +2425,7 @@
         }
 
         // ============================================================
-        //  GOLDEN TASKS MANAGEMENT
+        //  GOLDEN TASKS
         // ============================================================
         function createGoldenTaskHTML(id, name, days) {
             const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -2457,9 +2440,7 @@
                         <input type="text" placeholder="Golden task name" value="${name || ''}" class="gt-name-input" />
                         <button class="gt-remove" onclick="removeGoldenTask('${id}')">✕</button>
                     </div>
-                    <div class="gt-days">
-                        ${chips}
-                    </div>
+                    <div class="gt-days">${chips}</div>
                 </div>
             `;
         }
@@ -2470,20 +2451,16 @@
             const html = createGoldenTaskHTML(id, '', []);
             container.insertAdjacentHTML('beforeend', html);
             container.lastElementChild.querySelectorAll('.day-chip').forEach(chip => {
-                chip.addEventListener('click', function(e) {
-                    this.classList.toggle('selected');
-                });
+                chip.addEventListener('click', function() { this.classList.toggle('selected'); });
             });
         }
 
         function removeGoldenTask(id) {
             if (STATE.onboarded) {
                 STATE.goldenTasks = STATE.goldenTasks.filter(gt => gt.id !== id);
-                saveState().then(() => {
-                    renderSettings();
+                saveState().then(() => { renderSettings();
                     renderDashboard();
-                    renderCalendar();
-                });
+                    renderCalendar(); });
                 showToast('Golden task removed');
             } else {
                 const el = document.querySelector(`.golden-task-item[data-golden-id="${id}"]`);
@@ -2496,13 +2473,10 @@
             const tasks = [];
             items.forEach(item => {
                 const id = item.dataset.goldenId;
-                const nameInput = item.querySelector('.gt-name-input');
-                const name = nameInput.value.trim();
-                const dayChips = item.querySelectorAll('.gt-days .day-chip.selected');
-                const days = Array.from(dayChips).map(chip => parseInt(chip.dataset.day, 10));
-                if (name && days.length > 0) {
-                    tasks.push({ id, name, days });
-                }
+                const name = item.querySelector('.gt-name-input').value.trim();
+                const days = Array.from(item.querySelectorAll('.gt-days .day-chip.selected'))
+                    .map(chip => parseInt(chip.dataset.day, 10));
+                if (name && days.length > 0) tasks.push({ id, name, days });
             });
             return tasks;
         }
@@ -2510,50 +2484,38 @@
         function addGoldenTaskSettings() {
             const id = 'gt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
             STATE.goldenTasks.push({ id, name: '', days: [] });
-            saveState().then(() => {
-                renderSettings();
+            saveState().then(() => { renderSettings();
                 renderDashboard();
-                renderCalendar();
-            });
+                renderCalendar(); });
         }
 
         // ============================================================
-        //  DAILY TASKS MANAGEMENT
+        //  DAILY TASKS
         // ============================================================
         function addDailyTask() {
             const id = 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
             STATE.tasks.push({ id, name: 'New Task' });
-            saveState().then(() => {
-                renderSettings();
+            saveState().then(() => { renderSettings();
                 renderDashboard();
-                renderCalendar();
-            });
+                renderCalendar(); });
         }
 
         function removeDailyTask(id) {
             STATE.tasks = STATE.tasks.filter(t => t.id !== id);
             for (const date of Object.keys(STATE.history)) {
-                if (STATE.history[date][id] !== undefined) {
-                    delete STATE.history[date][id];
-                }
+                if (STATE.history[date][id] !== undefined) delete STATE.history[date][id];
             }
-            saveState().then(() => {
-                renderSettings();
+            saveState().then(() => { renderSettings();
                 renderDashboard();
-                renderCalendar();
-            });
+                renderCalendar(); });
             showToast('Daily task removed');
         }
 
         function updateDailyTaskName(id, newName) {
             const task = STATE.tasks.find(t => t.id === id);
-            if (task) {
-                task.name = newName;
-                saveState().then(() => {
-                    renderDashboard();
-                    renderCalendar();
-                });
-            }
+            if (task) { task.name = newName;
+                saveState().then(() => { renderDashboard();
+                    renderCalendar(); }); }
         }
 
         // ============================================================
@@ -2565,10 +2527,7 @@
                 reader.onload = (e) => {
                     try {
                         const data = JSON.parse(e.target.result);
-                        if (!data.state) {
-                            reject(new Error('Invalid backup format'));
-                            return;
-                        }
+                        if (!data.state) { reject(new Error('Invalid backup format')); return; }
                         const s = data.state;
                         STATE.userName = s.userName || 'Hero';
                         STATE.userAvatar = s.userAvatar || '🧙';
@@ -2584,9 +2543,7 @@
                         STATE.lastActiveDate = s.lastActiveDate || getToday();
                         STATE.theme = s.theme || 'dark';
                         resolve();
-                    } catch (err) {
-                        reject(err);
-                    }
+                    } catch (err) { reject(err); }
                 };
                 reader.onerror = () => reject(new Error('Failed to read file'));
                 reader.readAsText(file);
@@ -2610,19 +2567,15 @@
                 renderSettings();
                 showToast('✅ Backup imported successfully!');
                 triggerConfetti();
-            }).catch(err => {
-                showToast('❌ Error importing backup: ' + err.message);
-                console.error(err);
-            });
+            }).catch(err => { showToast('❌ Error importing backup: ' + err.message);
+                console.error(err); });
             event.target.value = '';
         }
 
         function importBackup(event) {
             const file = event.target.files[0];
             if (!file) return;
-            importBackupInternal(file).then(() => {
-                return saveState();
-            }).then(() => {
+            importBackupInternal(file).then(() => saveState()).then(() => {
                 applyTheme(STATE.theme);
                 renderDashboard();
                 renderCalendar();
@@ -2630,10 +2583,8 @@
                 renderSettings();
                 showToast('✅ Backup imported successfully!');
                 triggerConfetti();
-            }).catch(err => {
-                showToast('❌ Error importing backup: ' + err.message);
-                console.error(err);
-            });
+            }).catch(err => { showToast('❌ Error importing backup: ' + err.message);
+                console.error(err); });
             event.target.value = '';
         }
 
@@ -2670,11 +2621,8 @@
         // ============================================================
         //  RENDER FUNCTIONS
         // ============================================================
-
         function renderDashboard() {
             const today = getToday();
-            const weekday = new Date().getDay();
-
             const hour = new Date().getHours();
             let timeGreeting = 'day';
             if (hour < 12) timeGreeting = 'morning';
@@ -2705,38 +2653,33 @@
             taskList.innerHTML = '';
             if (tasks.length === 0) {
                 taskList.innerHTML =
-                    '<div style="color:var(--text-muted);font-size:14px;padding:12px 0;text-align:center;">All caught up! 🎉</div>';
+                    '<div style="color:var(--text-muted);font-size:13px;padding:10px 0;text-align:center;">All caught up! 🎉</div>';
             } else {
                 tasks.forEach(task => {
                     const card = document.createElement('div');
                     const isGolden = task.isGolden || task.golden;
                     card.className = `task-card ${task.done ? 'done' : ''}`;
-                    if (isGolden) {
-                        card.classList.add('golden');
-                    }
+                    if (isGolden) card.classList.add('golden');
                     card.dataset.taskId = task.id;
-
                     const xpReward = isGolden ? 25 : 10;
                     const coinReward = isGolden ? 5 : 2;
-
                     card.innerHTML = `
                         <div class="task-check">${task.done ? '✓' : ''}</div>
                         <div class="task-info">
-                          <div class="task-name">${task.name}</div>
-                          <div class="task-meta">
-                            ${isGolden ? '<span class="gold-badge">⭐ Golden</span>' : ''}
-                            <span>+${xpReward} XP</span>
-                            <span>+${coinReward} 🪙</span>
-                          </div>
+                            <div class="task-name">${task.name}</div>
+                            <div class="task-meta">
+                                ${isGolden ? '<span class="gold-badge">⭐ Golden</span>' : ''}
+                                <span>+${xpReward} XP</span>
+                                <span>+${coinReward} 🪙</span>
+                            </div>
                         </div>
                         <div class="task-xp">${task.done ? '✓' : '⚡'}</div>
                         <div class="task-glow"></div>
-                      `;
+                    `;
                     card.addEventListener('click', () => toggleTask(task.id));
                     taskList.appendChild(card);
                 });
             }
-
             document.getElementById('taskCount').textContent = `${doneCount} / ${totalTasks}`;
 
             STATE.streak = getStreak();
@@ -2748,54 +2691,44 @@
         function drawProgressRing(percent) {
             const canvas = document.getElementById('progressRing');
             const ctx = canvas.getContext('2d');
-            const size = 144;
+            const size = 128;
             const center = size / 2;
-            const radius = 60;
-            const lineWidth = 12;
-
+            const radius = 52;
+            const lineWidth = 10;
             ctx.clearRect(0, 0, size, size);
-
             ctx.beginPath();
             ctx.arc(center, center, radius, 0, Math.PI * 2);
             ctx.strokeStyle = 'rgba(255,255,255,0.06)';
             ctx.lineWidth = lineWidth;
             ctx.stroke();
-
             const start = -Math.PI / 2;
             const end = start + (Math.PI * 2 * (percent / 100));
             const gradient = ctx.createConicGradient(0, center, center);
             gradient.addColorStop(0, '#7c5cfc');
             gradient.addColorStop(0.5, '#a78bfa');
             gradient.addColorStop(1, '#7c5cfc');
-
             ctx.beginPath();
             ctx.arc(center, center, radius, start, end);
             ctx.strokeStyle = gradient;
             ctx.lineWidth = lineWidth;
             ctx.lineCap = 'round';
             ctx.stroke();
-
             ctx.shadowColor = 'rgba(124,92,252,0.3)';
             ctx.shadowBlur = 20;
             ctx.beginPath();
             ctx.arc(center, center, radius, start, end);
             ctx.strokeStyle = 'rgba(124,92,252,0.1)';
-            ctx.lineWidth = lineWidth + 8;
+            ctx.lineWidth = lineWidth + 6;
             ctx.stroke();
             ctx.shadowBlur = 0;
         }
 
-        // ============================================================
-        //  CALENDAR RENDER
-        // ============================================================
         function renderCalendar() {
-            const year = calViewDate.getFullYear();
-            const month = calViewDate.getMonth();
+            const year = calViewDate.getFullYear(),
+                month = calViewDate.getMonth();
             document.getElementById('calMonthLabel').textContent = formatMonth(calViewDate);
-
             const grid = document.getElementById('calGrid');
             grid.innerHTML = '';
-
             const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             dayNames.forEach(name => {
                 const el = document.createElement('div');
@@ -2803,18 +2736,14 @@
                 el.textContent = name;
                 grid.appendChild(el);
             });
-
             const firstDay = getFirstDayOfMonth(year, month);
             const daysInMonth = getDaysInMonth(year, month);
-            const today = new Date();
             const todayStr = getToday();
-
             for (let i = 0; i < firstDay; i++) {
                 const el = document.createElement('div');
                 el.className = 'cal-day other-month';
                 grid.appendChild(el);
             }
-
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(year, month, d);
                 const dateKey = getDateKey(dateObj);
@@ -2822,25 +2751,14 @@
                 const el = document.createElement('div');
                 el.className = 'cal-day';
                 el.textContent = d;
-
-                if (dateKey === todayStr) {
-                    el.classList.add('today');
-                }
-
+                if (dateKey === todayStr) el.classList.add('today');
                 const hasGolden = STATE.goldenTasks.some(gt => gt.days.includes(weekday));
-                if (hasGolden) {
-                    el.classList.add('has-golden');
-                }
-
+                if (hasGolden) el.classList.add('has-golden');
                 const dayHistory = STATE.history[dateKey] || {};
                 const hasDone = Object.values(dayHistory).some(v => v === true);
-                if (hasDone && dateKey !== todayStr) {
-                    el.classList.add('completed');
-                }
-
+                if (hasDone && dateKey !== todayStr) el.classList.add('completed');
                 grid.appendChild(el);
             }
-
             renderGoldenReminders();
             renderHeatmap();
         }
@@ -2862,16 +2780,11 @@
             });
         }
 
-        // ============================================================
-        //  HEATMAP
-        // ============================================================
         function renderHeatmap() {
             const grid = document.getElementById('heatmapGrid');
             grid.innerHTML = '';
-            const today = new Date();
-            const start = new Date(today);
+            const start = new Date();
             start.setDate(start.getDate() - 89);
-
             for (let i = 0; i < 90; i++) {
                 const d = new Date(start);
                 d.setDate(d.getDate() + i);
@@ -2879,16 +2792,13 @@
                 const dayHistory = STATE.history[key] || {};
                 const totalTasks = STATE.tasks.length || 1;
                 let doneCount = 0;
-                for (const k of Object.keys(dayHistory)) {
-                    if (dayHistory[k] === true) doneCount++;
-                }
+                for (const k of Object.keys(dayHistory)) { if (dayHistory[k] === true) doneCount++; }
                 const rate = Math.round((doneCount / totalTasks) * 100);
                 let level = 0;
                 if (rate > 0 && rate < 25) level = 1;
                 else if (rate >= 25 && rate < 50) level = 2;
                 else if (rate >= 50 && rate < 75) level = 3;
                 else if (rate >= 75) level = 4;
-
                 const el = document.createElement('div');
                 el.className = `heat-cell level-${level}`;
                 if (key === getToday()) el.classList.add('today-heat');
@@ -2898,18 +2808,13 @@
         }
 
         function renderAnalytics() {
-            const longest = getLongestStreak();
-            document.getElementById('anaLongestStreak').textContent = longest;
-
-            const totalDone = getTotalTasksDone();
-            document.getElementById('anaTotalDone').textContent = totalDone;
+            document.getElementById('anaLongestStreak').textContent = getLongestStreak();
+            document.getElementById('anaTotalDone').textContent = getTotalTasksDone();
             document.getElementById('anaTotalXP').textContent = STATE.xp;
             document.getElementById('anaTotalCoins').textContent = STATE.coins;
-
             drawDailyChart();
             drawWeeklyChart();
             drawMonthlyChart();
-
             document.getElementById('anaStatsText').innerHTML =
                 `Total XP: <span id="anaTotalXP">${STATE.xp}</span> · Coins: <span id="anaTotalCoins">${STATE.coins}</span>`;
         }
@@ -2917,9 +2822,9 @@
         function drawDailyChart() {
             const canvas = document.getElementById('chartDaily');
             const ctx = canvas.getContext('2d');
-            const rect = canvas.parentElement.getBoundingClientRect();
-            const width = canvas.parentElement.clientWidth - 24;
-            const height = 140;
+            const parent = canvas.parentElement;
+            const width = parent.clientWidth - 20;
+            const height = 120;
             canvas.width = width * 2;
             canvas.height = height * 2;
             canvas.style.width = width + 'px';
@@ -2939,39 +2844,32 @@
                         100) });
             }
 
-            const pad = { top: 20, bottom: 24, left: 24, right: 12 };
+            const pad = { top: 16, bottom: 20, left: 16, right: 8 };
             const chartW = width - pad.left - pad.right;
             const chartH = height - pad.top - pad.bottom;
-
             ctx.clearRect(0, 0, width, height);
-
             const isDark = STATE.theme === 'dark';
-            const textColor = isDark ? '#a0a0c0' : '#4b456a';
             const mutedColor = isDark ? '#606080' : '#8b86a8';
+            const textColor = isDark ? '#a0a0c0' : '#4b456a';
             const bgColor = isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)';
-
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, width, height);
-
             const maxVal = 100;
             const barWidth = chartW / data.length * 0.6;
             const gap = chartW / data.length;
-
             data.forEach((item, i) => {
                 const x = pad.left + i * gap + (gap - barWidth) / 2;
                 const barH = (item.value / maxVal) * chartH;
                 const y = pad.top + chartH - barH;
-
                 const grad = ctx.createLinearGradient(x, y, x, pad.top + chartH);
                 grad.addColorStop(0, '#7c5cfc');
                 grad.addColorStop(1, isDark ? 'rgba(124,92,252,0.15)' : 'rgba(124,92,252,0.25)');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.roundRect(x, y, barWidth, barH, 4);
+                ctx.roundRect(x, y, barWidth, barH, 3);
                 ctx.fill();
-
                 ctx.fillStyle = mutedColor;
-                ctx.font = '9px system-ui';
+                ctx.font = '8px system-ui';
                 ctx.textAlign = 'center';
                 ctx.fillText(item.label, x + barWidth / 2, height - 4);
                 ctx.fillStyle = textColor;
@@ -2983,9 +2881,9 @@
         function drawWeeklyChart() {
             const canvas = document.getElementById('chartWeekly');
             const ctx = canvas.getContext('2d');
-            const rect = canvas.parentElement.getBoundingClientRect();
-            const width = canvas.parentElement.clientWidth - 24;
-            const height = 140;
+            const parent = canvas.parentElement;
+            const width = parent.clientWidth - 20;
+            const height = 120;
             canvas.width = width * 2;
             canvas.height = height * 2;
             canvas.style.width = width + 'px';
@@ -2995,8 +2893,8 @@
             const weeks = [];
             const today = new Date();
             for (let w = 3; w >= 0; w--) {
-                let sum = 0;
-                let count = 0;
+                let sum = 0,
+                    count = 0;
                 const start = new Date(today);
                 start.setDate(start.getDate() - (w * 7) - 6);
                 for (let i = 0; i < 7; i++) {
@@ -3008,41 +2906,35 @@
                     sum += done;
                     count += STATE.tasks.length || 1;
                 }
-                const rate = count > 0 ? Math.round((sum / count) * 100) : 0;
-                weeks.push({ label: `W${4 - w}`, value: rate });
+                weeks.push({ label: `W${4 - w}`, value: count > 0 ? Math.round((sum / count) * 100) : 0 });
             }
 
-            const pad = { top: 20, bottom: 24, left: 24, right: 12 };
+            const pad = { top: 16, bottom: 20, left: 16, right: 8 };
             const chartW = width - pad.left - pad.right;
             const chartH = height - pad.top - pad.bottom;
-
             ctx.clearRect(0, 0, width, height);
             const isDark = STATE.theme === 'dark';
-            const textColor = isDark ? '#a0a0c0' : '#4b456a';
             const mutedColor = isDark ? '#606080' : '#8b86a8';
+            const textColor = isDark ? '#a0a0c0' : '#4b456a';
             const bgColor = isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)';
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, width, height);
-
             const maxVal = 100;
             const barWidth = chartW / weeks.length * 0.6;
             const gap = chartW / weeks.length;
-
             weeks.forEach((item, i) => {
                 const x = pad.left + i * gap + (gap - barWidth) / 2;
                 const barH = (item.value / maxVal) * chartH;
                 const y = pad.top + chartH - barH;
-
                 const grad = ctx.createLinearGradient(x, y, x, pad.top + chartH);
                 grad.addColorStop(0, '#34d399');
                 grad.addColorStop(1, isDark ? 'rgba(52,211,153,0.15)' : 'rgba(52,211,153,0.25)');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.roundRect(x, y, barWidth, barH, 4);
+                ctx.roundRect(x, y, barWidth, barH, 3);
                 ctx.fill();
-
                 ctx.fillStyle = mutedColor;
-                ctx.font = '9px system-ui';
+                ctx.font = '8px system-ui';
                 ctx.textAlign = 'center';
                 ctx.fillText(item.label, x + barWidth / 2, height - 4);
                 ctx.fillStyle = textColor;
@@ -3054,9 +2946,9 @@
         function drawMonthlyChart() {
             const canvas = document.getElementById('chartMonthly');
             const ctx = canvas.getContext('2d');
-            const rect = canvas.parentElement.getBoundingClientRect();
-            const width = canvas.parentElement.clientWidth - 24;
-            const height = 140;
+            const parent = canvas.parentElement;
+            const width = parent.clientWidth - 20;
+            const height = 120;
             canvas.width = width * 2;
             canvas.height = height * 2;
             canvas.style.width = width + 'px';
@@ -3067,8 +2959,8 @@
             const today = new Date();
             for (let m = 5; m >= 0; m--) {
                 const d = new Date(today.getFullYear(), today.getMonth() - m, 1);
-                let sum = 0;
-                let count = 0;
+                let sum = 0,
+                    count = 0;
                 const daysInMonth = getDaysInMonth(d.getFullYear(), d.getMonth());
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dateObj = new Date(d.getFullYear(), d.getMonth(), day);
@@ -3078,41 +2970,36 @@
                     sum += done;
                     count += STATE.tasks.length || 1;
                 }
-                const rate = count > 0 ? Math.round((sum / count) * 100) : 0;
-                months.push({ label: d.toLocaleDateString('en-US', { month: 'short' }), value: rate });
+                months.push({ label: d.toLocaleDateString('en-US', { month: 'short' }), value: count > 0 ? Math.round((
+                        sum / count) * 100) : 0 });
             }
 
-            const pad = { top: 20, bottom: 24, left: 24, right: 12 };
+            const pad = { top: 16, bottom: 20, left: 16, right: 8 };
             const chartW = width - pad.left - pad.right;
             const chartH = height - pad.top - pad.bottom;
-
             ctx.clearRect(0, 0, width, height);
             const isDark = STATE.theme === 'dark';
-            const textColor = isDark ? '#a0a0c0' : '#4b456a';
             const mutedColor = isDark ? '#606080' : '#8b86a8';
+            const textColor = isDark ? '#a0a0c0' : '#4b456a';
             const bgColor = isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)';
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, width, height);
-
             const maxVal = 100;
             const barWidth = chartW / months.length * 0.6;
             const gap = chartW / months.length;
-
             months.forEach((item, i) => {
                 const x = pad.left + i * gap + (gap - barWidth) / 2;
                 const barH = (item.value / maxVal) * chartH;
                 const y = pad.top + chartH - barH;
-
                 const grad = ctx.createLinearGradient(x, y, x, pad.top + chartH);
                 grad.addColorStop(0, '#fbbf24');
                 grad.addColorStop(1, isDark ? 'rgba(251,191,36,0.15)' : 'rgba(251,191,36,0.25)');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.roundRect(x, y, barWidth, barH, 4);
+                ctx.roundRect(x, y, barWidth, barH, 3);
                 ctx.fill();
-
                 ctx.fillStyle = mutedColor;
-                ctx.font = '9px system-ui';
+                ctx.font = '8px system-ui';
                 ctx.textAlign = 'center';
                 ctx.fillText(item.label, x + barWidth / 2, height - 4);
                 ctx.fillStyle = textColor;
@@ -3130,11 +3017,10 @@
             }
             document.getElementById('settingsName').textContent = STATE.userName || 'Hero';
 
-            // Daily Tasks
             const dailyList = document.getElementById('settingsDailyList');
             dailyList.innerHTML = '';
             if (STATE.tasks.length === 0) {
-                dailyList.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px 0;">No daily tasks</div>';
+                dailyList.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:6px 0;">No daily tasks</div>';
             } else {
                 STATE.tasks.forEach(task => {
                     const div = document.createElement('div');
@@ -3143,33 +3029,27 @@
                     input.type = 'text';
                     input.value = task.name;
                     input.placeholder = 'Task name';
-                    input.addEventListener('change', function() {
-                        updateDailyTaskName(task.id, this.value);
-                    });
+                    input.addEventListener('change', function() { updateDailyTaskName(task.id, this.value); });
                     const removeBtn = document.createElement('button');
                     removeBtn.className = 'task-remove';
                     removeBtn.textContent = '✕';
-                    removeBtn.onclick = function(e) {
-                        e.stopPropagation();
-                        removeDailyTask(task.id);
-                    };
+                    removeBtn.onclick = function(e) { e.stopPropagation();
+                        removeDailyTask(task.id); };
                     div.appendChild(input);
                     div.appendChild(removeBtn);
                     dailyList.appendChild(div);
                 });
             }
 
-            // Golden Tasks
             const goldenList = document.getElementById('settingsGoldenList');
             goldenList.innerHTML = '';
             if (STATE.goldenTasks.length === 0) {
-                goldenList.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px 0;">No golden tasks</div>';
+                goldenList.innerHTML = '<div style="color:var(--text-muted);font-size:12px;padding:6px 0;">No golden tasks</div>';
             } else {
                 STATE.goldenTasks.forEach(gt => {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'golden-task-item';
                     wrapper.dataset.goldenId = gt.id;
-
                     const row = document.createElement('div');
                     row.className = 'gt-row';
                     const nameInput = document.createElement('input');
@@ -3179,24 +3059,17 @@
                     nameInput.className = 'gt-name-input';
                     nameInput.addEventListener('change', function() {
                         const task = STATE.goldenTasks.find(t => t.id === gt.id);
-                        if (task) {
-                            task.name = this.value;
-                            saveState().then(() => {
-                                renderDashboard();
-                                renderCalendar();
-                            });
-                        }
+                        if (task) { task.name = this.value;
+                            saveState().then(() => { renderDashboard();
+                                renderCalendar(); }); }
                     });
                     const removeBtn = document.createElement('button');
                     removeBtn.className = 'gt-remove';
                     removeBtn.textContent = '✕';
-                    removeBtn.onclick = function() {
-                        removeGoldenTask(gt.id);
-                    };
+                    removeBtn.onclick = function() { removeGoldenTask(gt.id); };
                     row.appendChild(nameInput);
                     row.appendChild(removeBtn);
                     wrapper.appendChild(row);
-
                     const daysDiv = document.createElement('div');
                     daysDiv.className = 'gt-days';
                     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -3211,13 +3084,9 @@
                             const selected = Array.from(daysDiv.querySelectorAll('.day-chip.selected'))
                                 .map(el => parseInt(el.dataset.day, 10));
                             const task = STATE.goldenTasks.find(t => t.id === gt.id);
-                            if (task) {
-                                task.days = selected;
-                                saveState().then(() => {
-                                    renderDashboard();
-                                    renderCalendar();
-                                });
-                            }
+                            if (task) { task.days = selected;
+                                saveState().then(() => { renderDashboard();
+                                    renderCalendar(); }); }
                         });
                         daysDiv.appendChild(chip);
                     });
@@ -3225,34 +3094,26 @@
                     goldenList.appendChild(wrapper);
                 });
             }
-
             updatePWAStatus();
             const toggle = document.getElementById('themeToggle');
             if (toggle) {
-                if (STATE.theme === 'light') {
-                    toggle.classList.remove('on');
-                } else {
-                    toggle.classList.add('on');
-                }
+                if (STATE.theme === 'light') toggle.classList.remove('on');
+                else toggle.classList.add('on');
             }
         }
 
         // ============================================================
         //  ACTIONS
         // ============================================================
-
         function toggleTask(taskId) {
             const today = getToday();
             if (!STATE.history[today]) STATE.history[today] = {};
-
             const tasks = getTodayTasks();
             const task = tasks.find(t => t.id === taskId);
             if (!task) return;
-
             const current = STATE.history[today][taskId] || false;
             const newVal = !current;
             STATE.history[today][taskId] = newVal;
-
             if (newVal) {
                 const isGolden = task.isGolden || task.golden;
                 const xpGain = isGolden ? 25 : 10;
@@ -3261,23 +3122,17 @@
                 STATE.coins += coinGain;
                 STATE.totalTasksDone = (STATE.totalTasksDone || 0) + 1;
                 showToast(`+${xpGain} XP, +${coinGain} 🪙`);
-
                 const newLevel = getLevelForXP(STATE.xp);
                 if (newLevel > STATE.xpLevel) {
                     STATE.xpLevel = newLevel;
                     showToast(`🎉 Level Up! You're now level ${newLevel}!`);
                     triggerConfetti();
                 }
-
                 const streak = getStreak();
-                if (streak > 0 && streak % 7 === 0) {
-                    showToast(`🔥 ${streak} day streak! Amazing!`);
-                    triggerConfetti();
-                }
-                if (streak > 0 && streak % 5 === 0) {
-                    STATE.coins += 10;
-                    showToast(`🎁 +10 bonus coins for ${streak} day streak!`);
-                }
+                if (streak > 0 && streak % 7 === 0) { showToast(`🔥 ${streak} day streak! Amazing!`);
+                    triggerConfetti(); }
+                if (streak > 0 && streak % 5 === 0) { STATE.coins += 10;
+                    showToast(`🎁 +10 bonus coins for ${streak} day streak!`); }
             } else {
                 const isGolden = task.isGolden || task.golden;
                 const xpGain = isGolden ? 25 : 10;
@@ -3286,16 +3141,12 @@
                 STATE.coins = Math.max(0, STATE.coins - coinGain);
                 STATE.totalTasksDone = Math.max(0, (STATE.totalTasksDone || 0) - 1);
             }
-
             STATE.streak = getStreak();
             STATE.longestStreak = Math.max(STATE.longestStreak || 0, STATE.streak);
             STATE.xpLevel = getLevelForXP(STATE.xp);
-
-            saveState().then(() => {
-                renderDashboard();
+            saveState().then(() => { renderDashboard();
                 renderCalendar();
-                renderAnalytics();
-            });
+                renderAnalytics(); });
         }
 
         function navigateTo(screen) {
@@ -3304,7 +3155,6 @@
             document.getElementById(screen).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             document.querySelector(`.nav-btn[data-screen="${screen}"]`)?.classList.add('active');
-
             switch (screen) {
                 case 'dashboard':
                     renderDashboard();
@@ -3330,49 +3180,26 @@
         function onboardNext() {
             const steps = document.querySelectorAll('.onboard-step');
             const current = steps[onboardStep];
-
             if (onboardStep === 1) {
                 const name = document.getElementById('onName').value.trim();
-                if (!name) {
-                    showToast('Please enter your name');
-                    return;
-                }
+                if (!name) { showToast('Please enter your name'); return; }
                 STATE.userName = name;
             }
-            if (onboardStep === 2) {
-                STATE.userAvatar = selectedAvatar;
-            }
+            if (onboardStep === 2) STATE.userAvatar = selectedAvatar;
             if (onboardStep === 3) {
                 const inputs = document.querySelectorAll('#onTaskList input');
                 const names = [];
-                inputs.forEach(inp => {
-                    const v = inp.value.trim();
-                    if (v) names.push(v);
-                });
-                if (names.length === 0) {
-                    showToast('Please add at least one task');
-                    return;
-                }
-                STATE.tasks = names.map((name, i) => ({
-                    id: 'task_' + i + '_' + Date.now(),
-                    name,
-                }));
+                inputs.forEach(inp => { const v = inp.value.trim(); if (v) names.push(v); });
+                if (names.length === 0) { showToast('Please add at least one task'); return; }
+                STATE.tasks = names.map((name, i) => ({ id: 'task_' + i + '_' + Date.now(), name }));
             }
-
             current.classList.remove('active');
             onboardStep++;
-            if (onboardStep >= totalSteps) {
-                finishOnboarding();
-                return;
-            }
+            if (onboardStep >= totalSteps) { finishOnboarding(); return; }
             steps[onboardStep].classList.add('active');
-
-            if (onboardStep === 1) {
-                document.getElementById('onName').focus();
-            }
+            if (onboardStep === 1) document.getElementById('onName').focus();
             if (onboardStep === 4) {
-                const container = document.getElementById('goldenTasksContainer');
-                container.innerHTML = '';
+                document.getElementById('goldenTasksContainer').innerHTML = '';
                 addGoldenTaskOnboard();
             }
         }
@@ -3383,44 +3210,31 @@
             document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
             option.classList.add('selected');
             const img = option.querySelector('img');
-            if (img) {
-                selectedAvatar = img.src;
-            } else {
-                selectedAvatar = option.dataset.avatar;
-            }
+            selectedAvatar = img ? img.src : option.dataset.avatar;
         });
 
         function addTaskRow() {
             const list = document.getElementById('onTaskList');
             const row = document.createElement('div');
             row.className = 'task-input-row';
-            row.innerHTML = `
-                <input placeholder="e.g. Read 20 min" />
-                <button class="task-remove" onclick="removeTaskRow(this)">✕</button>
-              `;
+            row.innerHTML =
+                `<input placeholder="e.g. Read 20 min" /><button class="task-remove" onclick="removeTaskRow(this)">✕</button>`;
             list.appendChild(row);
         }
 
         function removeTaskRow(btn) {
             const row = btn.closest('.task-input-row');
             const list = document.getElementById('onTaskList');
-            if (list.children.length > 1) {
-                row.remove();
-            } else {
-                showToast('Keep at least one task');
-            }
+            if (list.children.length > 1) row.remove();
+            else showToast('Keep at least one task');
         }
 
-        function skipGolden() {
-            STATE.goldenTasks = [];
-            finishOnboarding();
-        }
+        function skipGolden() { STATE.goldenTasks = [];
+            finishOnboarding(); }
 
         function finishOnboarding() {
             const container = document.getElementById('goldenTasksContainer');
-            const goldenTasks = collectGoldenTasksFromDOM(container);
-            STATE.goldenTasks = goldenTasks;
-
+            STATE.goldenTasks = collectGoldenTasksFromDOM(container);
             STATE.onboarded = true;
             STATE.streak = 0;
             STATE.xp = 0;
@@ -3430,7 +3244,6 @@
             STATE.totalTasksDone = 0;
             STATE.longestStreak = 0;
             STATE.lastActiveDate = getToday();
-
             saveState().then(() => {
                 document.getElementById('onboarding').classList.remove('active');
                 document.getElementById('dashboard').classList.add('active');
@@ -3442,32 +3255,19 @@
             });
         }
 
-        // ============================================================
-        //  CALENDAR NAV
-        // ============================================================
-        function calPrev() {
-            calViewDate.setMonth(calViewDate.getMonth() - 1);
-            renderCalendar();
-        }
+        function calPrev() { calViewDate.setMonth(calViewDate.getMonth() - 1);
+            renderCalendar(); }
 
-        function calNext() {
-            calViewDate.setMonth(calViewDate.getMonth() + 1);
-            renderCalendar();
-        }
+        function calNext() { calViewDate.setMonth(calViewDate.getMonth() + 1);
+            renderCalendar(); }
 
-        // ============================================================
-        //  RESET
-        // ============================================================
         function resetApp() {
             if (!confirm('⚠️ This will erase ALL your data. Are you sure?')) return;
             if (!confirm('Really? This cannot be undone.')) return;
-
             if (db) {
                 const tx = db.transaction('state', 'readwrite');
-                const store = tx.objectStore('state');
-                store.clear();
+                tx.objectStore('state').clear();
             }
-
             STATE.userName = '';
             STATE.userAvatar = '🧙';
             STATE.tasks = [];
@@ -3482,22 +3282,19 @@
             STATE.onboarded = false;
             STATE.lastActiveDate = null;
             STATE.theme = 'dark';
-
             saveState().then(() => {
                 document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
                 document.getElementById('onboarding').classList.add('active');
                 document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
                 onboardStep = 0;
-                document.querySelectorAll('.onboard-step').forEach((el, i) => {
-                    el.classList.toggle('active', i === 0);
-                });
+                document.querySelectorAll('.onboard-step').forEach((el, i) => { el.classList.toggle('active', i === 0); });
                 applyTheme('dark');
                 showToast('🔄 App has been reset');
             });
         }
 
         // ============================================================
-        //  TOAST
+        //  TOAST & CONFETTI
         // ============================================================
         let toastTimeout = null;
 
@@ -3506,33 +3303,21 @@
             el.textContent = msg;
             el.classList.add('show');
             clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                el.classList.remove('show');
-            }, 2800);
+            toastTimeout = setTimeout(() => el.classList.remove('show'), 2600);
         }
 
-        // ============================================================
-        //  CONFETTI
-        // ============================================================
         function triggerConfetti() {
             const colors = ['#7c5cfc', '#fbbf24', '#34d399', '#f87171', '#60a5fa', '#a78bfa', '#f472b6'];
-            for (let i = 0; i < 60; i++) {
+            for (let i = 0; i < 50; i++) {
                 const el = document.createElement('div');
                 el.className = 'confetti-piece';
-                const size = 6 + Math.random() * 10;
+                const size = 5 + Math.random() * 9;
                 const color = colors[Math.floor(Math.random() * colors.length)];
                 const left = Math.random() * 100;
-                const delay = Math.random() * 0.8;
+                const delay = Math.random() * 0.7;
                 const dur = 1.2 + Math.random() * 1.2;
-                el.style.cssText = `
-                    left: ${left}%;
-                    width: ${size}px;
-                    height: ${size * 0.6}px;
-                    background: ${color};
-                    border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
-                    animation-delay: ${delay}s;
-                    animation-duration: ${dur}s;
-                  `;
+                el.style.cssText =
+                    `left:${left}%;width:${size}px;height:${size*0.6}px;background:${color};border-radius:${Math.random()>0.5?'50%':'2px'};animation-delay:${delay}s;animation-duration:${dur}s;`;
                 document.body.appendChild(el);
                 setTimeout(() => el.remove(), (delay + dur) * 1000 + 100);
             }
@@ -3546,7 +3331,7 @@
             const ctx = canvas.getContext('2d');
             let w, h;
             const particles = [];
-            const count = 70;
+            const count = 50;
 
             function resize() {
                 const rect = document.getElementById('app').getBoundingClientRect();
@@ -3560,10 +3345,10 @@
                 particles.push({
                     x: Math.random() * w,
                     y: Math.random() * h,
-                    vx: (Math.random() - 0.5) * 0.25,
-                    vy: (Math.random() - 0.5) * 0.25,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2,
                     r: 1 + Math.random() * 2,
-                    a: 0.2 + Math.random() * 0.3,
+                    a: 0.15 + Math.random() * 0.25,
                 });
             }
 
@@ -3584,11 +3369,11 @@
                         const dx = particles[i].x - particles[j].x;
                         const dy = particles[i].y - particles[j].y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 120) {
+                        if (dist < 100) {
                             ctx.beginPath();
                             ctx.moveTo(particles[i].x, particles[i].y);
                             ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle = `rgba(124,92,252,${0.06 * (1 - dist / 120)})`;
+                            ctx.strokeStyle = `rgba(124,92,252,${0.04 * (1 - dist / 100)})`;
                             ctx.lineWidth = 0.5;
                             ctx.stroke();
                         }
@@ -3605,23 +3390,13 @@
         function registerSW() {
             if ('serviceWorker' in navigator) {
                 const swCode = `
-                    self.addEventListener('install', e => {
-                      e.waitUntil(self.skipWaiting());
-                    });
-                    self.addEventListener('activate', e => {
-                      e.waitUntil(self.clients.claim());
-                    });
-                    self.addEventListener('fetch', e => {
-                      e.respondWith(
-                        fetch(e.request).catch(() => caches.match(e.request))
-                      );
-                    });
-                  `;
+                    self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+                    self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+                    self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+                `;
                 const blob = new Blob([swCode], { type: 'application/javascript' });
                 const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl, { scope: '/' })
-                    .then(() => console.log('SW registered'))
-                    .catch(() => console.log('SW registration failed'));
+                navigator.serviceWorker.register(swUrl, { scope: '/' }).catch(() => {});
             }
         }
 
@@ -3630,20 +3405,12 @@
         // ============================================================
         async function init() {
             registerSW();
+            try { await openDB();
+                await loadState(); } catch (e) { console.warn('DB not available', e); }
 
-            try {
-                await openDB();
-                await loadState();
-            } catch (e) {
-                console.warn('DB not available, using memory state', e);
-            }
-
-            // PWA beforeinstallprompt
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
+            window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault();
                 deferredPrompt = e;
-                updatePWAStatus();
-            });
+                updatePWAStatus(); });
 
             initParticles();
 
@@ -3672,20 +3439,12 @@
                 renderAnalytics();
                 renderSettings();
             } else {
-                document.querySelectorAll('.onboard-step').forEach((el, i) => {
-                    el.classList.toggle('active', i === 0);
-                });
-                if (STATE.userName) {
-                    document.getElementById('onName').value = STATE.userName;
-                }
+                document.querySelectorAll('.onboard-step').forEach((el, i) => { el.classList.toggle('active', i === 0); });
+                if (STATE.userName) document.getElementById('onName').value = STATE.userName;
                 const avatarOptions = document.querySelectorAll('.avatar-option');
                 avatarOptions.forEach(el => {
-                    if (el.dataset.avatar === STATE.userAvatar) {
-                        el.classList.add('selected');
-                        selectedAvatar = STATE.userAvatar;
-                    } else {
-                        el.classList.remove('selected');
-                    }
+                    if (el.dataset.avatar === STATE.userAvatar) { el.classList.add('selected');
+                        selectedAvatar = STATE.userAvatar; } else el.classList.remove('selected');
                 });
                 if (STATE.userAvatar && STATE.userAvatar.startsWith('data:image')) {
                     const grid = document.getElementById('avatarGrid');
@@ -3706,10 +3465,8 @@
                     STATE.tasks.forEach(task => {
                         const row = document.createElement('div');
                         row.className = 'task-input-row';
-                        row.innerHTML = `
-                            <input placeholder="e.g. Read 20 min" value="${task.name}" />
-                            <button class="task-remove" onclick="removeTaskRow(this)">✕</button>
-                          `;
+                        row.innerHTML =
+                            `<input placeholder="e.g. Read 20 min" value="${task.name}" /><button class="task-remove" onclick="removeTaskRow(this)">✕</button>`;
                         list.appendChild(row);
                     });
                 }
@@ -3720,9 +3477,7 @@
                         const html = createGoldenTaskHTML(gt.id, gt.name, gt.days);
                         container.insertAdjacentHTML('beforeend', html);
                         container.lastElementChild.querySelectorAll('.day-chip').forEach(chip => {
-                            chip.addEventListener('click', function() {
-                                this.classList.toggle('selected');
-                            });
+                            chip.addEventListener('click', function() { this.classList.toggle('selected'); });
                         });
                     });
                 } else {
@@ -3730,16 +3485,10 @@
                 }
             }
 
-            setInterval(() => {
-                saveState().catch(() => {});
-            }, 30000);
-
+            setInterval(() => saveState().catch(() => {}), 30000);
             document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'hidden') {
-                    saveState().catch(() => {});
-                }
+                if (document.visibilityState === 'hidden') saveState().catch(() => {});
             });
-
             console.log('🔥 HabitForge initialized');
         }
 
@@ -3796,5 +3545,6 @@
         window.removeDailyTask = removeDailyTask;
         window.updateDailyTaskName = updateDailyTaskName;
     </script>
+
 </body>
 </html>
